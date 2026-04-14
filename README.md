@@ -241,19 +241,19 @@ Three different themes are included for your use.
 
 ### **paper-resume**
 
-![paper-resume_thumb](./images/paper-resume_thumb.png)
+![paper-resume_thumb](./paper-resume/paper-resume_thumb.png)
 
 The paper-resume theme takes its cues from a traditional printed résumé, prioritising clean typography and a document-like layout. The candidate's name and headline sit prominently at the top, followed by the experience carousel as the dominant element on the page. The colour palette is warm and neutral — off-whites and soft greys — evoking the feel of quality paper stock. Navigation is minimal and unobtrusive, keeping the focus on content. This theme is for roles in more formal or traditional industries where a classic, professional aesthetic carries weight.
 
 ### **light-mode**
 
-![light-mode_thumb](./images/light-mode_thumb.png)
+![light-mode_thumb](./light-mode/light-mode_thumb.png)
 
 The light-mode theme is a contemporary, app-style layout built around a fixed sidebar that houses the candidate's name, contact links, and job navigation. The main content area sits to the right, giving the experience carousel and project grid plenty of breathing room. The palette leans into warm whites and subtle borders with gold accents, creating a polished look that feels at home alongside a modern portfolio or SaaS product. A moon icon in the top-right corner lets visitors switch to dark mode at any time, making this theme a versatile default for most audiences.
 
 ### **dark-mode**
 
-![dark-mode_thumb](./images/dark-mode_thumb.png)
+![dark-mode_thumb](./dark-mode/dark-mode_thumb.png)
 
 The dark-mode theme is structurally identical to light-mode — same sidebar layout, same gold accents, same navigation behaviour — but loads with a deep, near-black background and adjusted contrast levels that reduce eye strain in low-light environments. The gold highlights glow more vividly against the dark surfaces, giving the page a slightly more dramatic, editorial quality. A sun icon in the top-right corner lets visitors switch to light mode at any time. This theme is a strong choice for technical roles in software, DevOps, and design, where dark interfaces are a familiar and expected aesthetic.
 
