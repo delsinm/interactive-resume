@@ -22,7 +22,7 @@ Filter buttons above the grid let you narrow cards by category. The **All** butt
 
 ### Demos Page
 
-Page for listing technical demos. Demos are displayed in a list and are clickable links.
+Optional page for listing technical demos, enabled or disabled in code. Demos are displayed in a list and are clickable links.
 
 ### Dark Mode
 
