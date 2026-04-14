@@ -35,8 +35,15 @@
          show_demos: false   — button is hidden
        NOTE: The button links to demos.html. That file must exist in the same
        folder as index.html for the link to work.
+    
+    4. headshot
+       Controls whether the professional headshot is displayed.
+         headshot: true    — headshot is visible
+         headshot: false   — headshot is hidden
+       NOTE: The headshot links to headshot.jpg or headshot.png That file must 
+       exist in the same folder as index.html for the image to be visible.
 
-    4. experience
+    5. experience
        A list of jobs shown in the carousel. Each entry has:
          id          - unique key that links to the projects section (e.g. "job0")
                        Keep this stable — changing it breaks the project link.
@@ -50,7 +57,7 @@
        To REORDER jobs: move the entries freely — order on the page follows
                         the order in this list.
 
-    5. projects
+    6. projects
        A map of job id → list of project cards.
        Each project has:
          title - project name shown on the card
