@@ -1,0 +1,920 @@
+<!--
+=============================================================================
+  INTERACTIVE RESUME — USER GUIDE
+=============================================================================
+
+  HOW TO UPDATE THIS RESUME
+  --------------------------
+  All content is stored in a YAML block embedded in this file.
+  You do NOT need a web server — just open index.html in any browser.
+
+  FIND THE DATA
+  -------------
+  Jump to line 431 to find the <script type="text/yaml"> block.
+  It has five sections:
+
+    1. candidate  (line 434)
+       Personal info displayed in the page header. Fields:
+         name        - displayed as the large heading  (required)
+         description - subtitle shown below the name   (required)
+         email       - if present, shows an Email button linking to mailto:
+         linkedin    - if present, shows a LinkedIn button linking to the URL
+         github      - if present, shows a GitHub button linking to the URL
+       Omit or leave blank any of email / linkedin / github to hide that button.
+
+    2. experience  (line 441)
+       A list of jobs. Each entry has:
+         id          - unique key that links to the projects section (e.g. "job0")
+                       Keep this stable — changing it breaks the project link.
+         title       - job title
+         company     - employer name
+         period      - date range (e.g. "2022 - Present")
+         description - one-sentence summary shown on the carousel card
+
+       To ADD a job:    append a new entry and add a matching key under projects.
+       To REMOVE a job: delete the entry and its matching key under projects.
+       To REORDER jobs: move the entries freely — order on the page follows
+                        the order in this list.
+
+    3. show_demos  (line 485)
+       Controls whether the "Demos!" ribbon link appears in the top-right corner.
+         show_demos: true    — ribbon is visible (default)
+         show_demos: false   — ribbon is hidden
+       NOTE: The ribbon links to demos.html. That file must exist in the same
+       folder as index.html for the link to work.
+
+    4. project_categories  (line 490)
+       OPTIONAL. If present, sets the order of the filter buttons above the
+       project grid. If omitted, buttons are generated automatically from
+       the "cat" values found in the current job's projects (in the order
+       they first appear).
+       Either way, adding a new category is as simple as using a new "cat"
+       value on a project card — no other changes required.
+
+    5. projects  (line 498)
+       A map of job id → list of project cards.
+       Each project has:
+         title - project name shown on the card
+         cat   - category label; drives the filter buttons automatically
+         desc  - full description shown in the popup when a card is clicked
+
+       The special key "demos" maps to the Demos ribbon card.
+
+  TIPS
+  ----
+  - The carousel background styles cycle automatically — no changes needed
+    when adding or removing jobs.
+  - Project cards open a popup on click; no length limit on desc.
+  - Dark mode is built in (toggle button in the top-right corner).
+
+=============================================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Resume</title>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-page:        #f2f2f2;
+            --bg-card:        #ffffff;
+            --border:         #e2e8f0;
+            --text-primary:   #0f172a;
+            --text-secondary: #475569;
+            --text-muted:     #94a3b8;
+            --text-faint:     #e2e8f0;
+            --accent:         #4f46e5;
+            --accent-light:   #e0e7ff;
+            --accent-hover-bg:#eef2ff;
+            --blue:           #2563eb;
+            --blue-light:     #dbeafe;
+            --blue-hover-bg:  #eff6ff;
+            --btn-bg:         #f1f5f9;
+            --btn-border:     #e2e8f0;
+            --btn-text:       #475569;
+            --dot-inactive:   #e2e8f0;
+            --shadow-accent:  rgba(99,102,241,0.2);
+            --ribbon-bg:      #312e81; 
+            --ribbon-text:    #ffffff;
+        }
+
+        html.dark {
+            --bg-page:        #0f172a;
+            --bg-card:        #1e293b;
+            --border:         #334155;
+            --text-primary:   #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted:     #64748b;
+            --text-faint:     #1e293b;
+            --accent:         #818cf8;
+            --accent-light:   #312e81;
+            --accent-hover-bg:#1e293b;
+            --blue:           #60a5fa;
+            --blue-light:     #1e3a5f;
+            --blue-hover-bg:  #1e293b;
+            --btn-bg:         #334155;
+            --btn-border:     #475569;
+            --btn-text:       #cbd5e1;
+            --dot-inactive:   #334155;
+            --shadow-accent:  rgba(99,102,241,0.35);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .page { max-width: 1200px; margin: 0 auto; padding: 48px 24px; }
+
+        header { text-align: center; margin-bottom: 48px; position: relative; padding-bottom: 60px; }
+        header h1 { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; }
+        header p  { color: var(--text-muted); margin-top: 8px; font-style: italic; }
+
+        .header-left, .header-right {
+            position: absolute; top: 0;
+            display: flex; gap: 12px;
+        }
+        .header-left  { left: 0; flex-direction: column; align-items: flex-start; }
+        .header-right { right: 0; align-items: flex-start; }
+
+        @media (max-width: 600px) {
+            header {
+                position: static;
+                display: flex; flex-direction: column; align-items: center;
+                padding-bottom: 0; gap: 12px; margin-bottom: 32px;
+            }
+            header h1 { font-size: 1.6rem; order: 1; }
+            header > p { order: 2; }
+            .header-left {
+                position: static; order: 3;
+                flex-direction: row; flex-wrap: wrap; justify-content: center;
+            }
+            .header-right {
+                position: static; order: 0;
+                width: 100%; justify-content: flex-end; align-items: center;
+            }
+        }
+
+        .contact-link {
+            display: inline-block; padding: 6px 10px;
+            font-size: 0.8rem; font-weight: 600;
+            border-radius: 8px; border: 1px solid; text-decoration: none;
+            transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+        }
+        .contact-link:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+        .link-email    { color: var(--accent); border-color: var(--accent-light); }
+        .link-email:hover  { background: var(--accent-hover-bg); }
+        .link-linkedin { color: var(--blue);  border-color: var(--blue-light); }
+        .link-linkedin:hover { background: var(--blue-hover-bg); transform: translateY(-3px) rotate(-2deg); }
+        .link-github   { color: var(--btn-text); border-color: var(--btn-border); }
+        .link-github:hover  { background: var(--btn-bg); transform: translateY(-3px) rotate(2deg); }
+
+        .dark-toggle {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: none; background: var(--btn-bg);
+            cursor: pointer; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: box-shadow 0.2s;
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+        .dark-toggle:hover { box-shadow: 0 0 0 2px var(--accent); }
+
+        .demos-ribbon {
+            position: relative;
+            top: -15px;
+            width: 62px;
+            height: 100px;
+            background-color: var(--ribbon-bg);
+            z-index: 100;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.06) 25%, transparent 25%), 
+                              linear-gradient(225deg, rgba(255,255,255,0.06) 25%, transparent 25%), 
+                              linear-gradient(45deg, rgba(255,255,255,0.06) 25%, transparent 25%), 
+                              linear-gradient(315deg, rgba(255,255,255,0.06) 25%, transparent 25%);
+            background-position: 7px 0, 7px 0, 0 0, 0 0;
+            background-size: 12px 12px;
+            border-top: 5px solid var(--border);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.18), inset 0 -4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .demos-ribbon::after {
+            content: '';
+            position: absolute;
+            bottom: -30px; 
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 31px solid transparent;
+            border-right: 31px solid transparent;
+            border-top: 31px solid var(--ribbon-bg);
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
+            transition: border-top-color 0.2s;
+        }
+
+        .demos-ribbon:hover {
+            transform: translateY(3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.22), inset 0 -4px 6px rgba(0,0,0,0.15);
+        }
+
+        .ribbon-text {
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            padding-top: 8px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* ── Section title with added buffer ── */
+        .section-title {
+            font-size: 1.4rem; font-weight: 800;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 8px; 
+            margin-top: 20px; /* Added 20px buffer */
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .carousel-section { margin-bottom: 40px; }
+
+        .carousel-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px; padding: 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: opacity 0.32s ease, transform 0.32s ease, background-image 0.32s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 180px;
+        }
+        .carousel-card.fade-right { opacity: 0; transform: translateX(16px); }
+        .carousel-card.fade-left  { opacity: 0; transform: translateX(-16px); }
+
+        .carousel-card[data-slide="demos"] {
+            background-image:
+                radial-gradient(ellipse 110% 80% at 50% 10%, rgba(99,102,241,0.25) 0%, transparent 70%),
+                linear-gradient(rgba(99,102,241,0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,102,241,0.12) 1px, transparent 1px);
+            background-size: 100% 100%, 18px 18px, 18px 18px;
+            background-color: var(--bg-card);
+        }
+
+        .progress-bars { display: flex; gap: 4px; margin-bottom: 20px; }
+        .progress-bar  { flex: 1; height: 3px; border-radius: 999px; background: var(--dot-inactive); transition: background 0.3s; }
+        .progress-bar.active { background: var(--accent); }
+
+        .card-body { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+        .card-info h3   { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+        .card-company   { color: var(--accent); font-weight: 600; }
+        .card-period    { color: var(--text-muted); font-size: 0.85rem; margin-left: 8px; }
+        .card-desc      { margin-top: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .card-counter   { font-size: 2.2rem; font-weight: 900; color: var(--text-faint); flex-shrink: 0; }
+
+        .carousel-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+        .carousel-arrow {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--btn-bg); border: 1px solid var(--btn-border);
+            color: var(--btn-text); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .carousel-dots { display: flex; gap: 8px; }
+        .carousel-dot {
+            width: 28px; height: 28px; border-radius: 50%;
+            font-size: 0.75rem; border: 1px solid var(--btn-border);
+            background: var(--btn-bg); cursor: pointer;
+            color: var(--btn-text);
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+        .carousel-dot.active {
+            background: var(--accent); color: #fff; border-color: var(--accent);
+            box-shadow: 0 2px 8px var(--shadow-accent);
+        }
+
+        .projects-section { }
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-btn {
+            padding: 6px 14px; border-radius: 999px;
+            border: 1px solid var(--btn-border); background: var(--btn-bg);
+            color: var(--btn-text); font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+        .filter-btn.active {
+            background: var(--accent); color: #fff; border-color: var(--accent);
+            box-shadow: 0 2px 8px var(--shadow-accent);
+        }
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+        }
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px;
+            cursor: pointer;
+            position: relative;
+            min-height: 90px;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+        .project-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 16px var(--shadow-accent);
+            transform: translateY(-2px);
+        }
+        .project-card:active { transform: translateY(0); }
+        .project-cat  { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+        .project-name { font-weight: 700; margin-top: 4px; color: var(--text-primary); font-size: 0.9rem; }
+        .project-click-hint {
+            margin-top: 10px;
+            font-size: 0.7rem; font-weight: 600;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .project-card:hover .project-click-hint { opacity: 1; }
+
+        /* ── Project modal ── */
+        .modal-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(3px);
+            z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            padding: 24px;
+            animation: fade-in 0.18s ease;
+        }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 480px; width: 100%;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+            position: relative;
+            animation: slide-up 0.2s ease;
+        }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-cat {
+            font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.1em; color: var(--accent); margin-bottom: 10px;
+        }
+        .modal-title {
+            font-size: 1.2rem; font-weight: 800;
+            color: var(--text-primary); margin-bottom: 16px;
+            line-height: 1.3;
+        }
+        .modal-desc {
+            font-size: 0.92rem; color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        .modal-close {
+            position: absolute; top: 16px; right: 16px;
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 1px solid var(--btn-border);
+            background: var(--btn-bg); color: var(--btn-text);
+            font-size: 1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: box-shadow 0.2s, background 0.2s;
+            line-height: 1;
+        }
+        .modal-close:hover { box-shadow: 0 0 0 2px var(--accent); background: var(--accent-hover-bg); }
+
+        /* Loading / error states */
+        .loading-state {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 300px; color: var(--text-muted); font-size: 1rem;
+            gap: 10px;
+        }
+        .loading-spinner {
+            width: 20px; height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error-state {
+            padding: 24px; background: #fef2f2; border: 1px solid #fecaca;
+            border-radius: 12px; color: #b91c1c; font-size: 0.9rem;
+        }
+        html.dark .error-state {
+            background: #3b0f0f; border-color: #7f1d1d; color: #fca5a5;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/yaml" id="resume-data">
+# Candidate info — name and description are required; contact links are optional.
+# Omit (or leave blank) any of email, linkedin, or github to hide that button.
+candidate:
+  name: "Ash Ketchum"
+  description: "Staff DevOps Engineer & Pokémon Master"
+  email: "ash@catchmall.io"
+  linkedin: "https://linkedin.com/in/ashketchum"
+  github: "https://github.com/ashketchum"
+
+experience:
+  - id: "job0"
+    title: "Staff DevOps Engineer"
+    company: "Catch'm All, Inc."
+    period: "2022 - Present"
+    description: "Leading platform engineering strategy for a 400-engineer org, owning the developer platform, SRE practice, and cloud cost governance across three cloud providers."
+
+  - id: "job1"
+    title: "Senior DevOps Engineer"
+    company: "Silph Co."
+    period: "2019 - 2022"
+    description: "Designed and operated the CI/CD platform serving 150+ engineers, migrated a monolith to microservices on Kubernetes, and reduced P0 incident frequency by 70%."
+
+  - id: "job2"
+    title: "DevOps Engineer"
+    company: "Celadon Game Corner Tech"
+    period: "2017 - 2019"
+    description: "Built cloud infrastructure and deployment pipelines on AWS using Terraform and Ansible, supporting a team of 40 engineers shipping a SaaS analytics product."
+
+  - id: "job3"
+    title: "DevOps Engineer"
+    company: "Viridian Gym Solutions"
+    period: "2015 - 2017"
+    description: "Introduced containerisation and automated deployments to a legacy PHP stack, cutting release cycle from bi-weekly to daily and eliminating manual server provisioning."
+
+  - id: "job4"
+    title: "Junior Software Engineer"
+    company: "Brock's Pewter Analytics"
+    period: "2013 - 2015"
+    description: "Developed internal tooling and REST APIs in Python and Go, and acted as the team's informal build-and-release owner, scripting deploys and maintaining Jenkins pipelines."
+
+  - id: "job5"
+    title: "Software Engineer"
+    company: "Cascade Badge Software"
+    period: "2011 - 2013"
+    description: "Built customer-facing web features in Ruby on Rails and maintained MySQL schemas, while automating repetitive QA and provisioning tasks to improve team velocity."
+
+  - id: "job6"
+    title: "Systems Administrator"
+    company: "Oak's Pallet Lab IT"
+    period: "2009 - 2011"
+    description: "Administered Linux and Windows servers for 12 SMB clients, managed backups, patching, and network infrastructure, and wrote Bash scripts to automate routine maintenance tasks."
+
+# Set to false to hide the Demos ribbon link (requires demos.html to work)
+show_demos: true
+
+# Optional: define the order of filter buttons above the project grid.
+# If omitted entirely, buttons are derived automatically from the "cat"
+# values in each job's project list (in first-appearance order).
+project_categories:
+  - Infrastructure
+  - Automation
+  - Leadership
+  - Development
+
+# Projects are keyed by experience position ("job0", "job1", ...) or "demos"
+projects:
+  job0:
+    - title: "Internal Developer Platform"
+      cat: "Infrastructure"
+      desc: "Designed and launched an IDP built on Backstage, giving 400+ engineers self-service access to environments, runbooks, and ownership data — reducing platform team ticket volume by 55%."
+    - title: "Multi-Cloud Cost Governance"
+      cat: "Leadership"
+      desc: "Established a FinOps practice across AWS, GCP, and Azure, implementing tagging standards, budget alerting, and quarterly cost reviews that recovered $1.2M in annual cloud waste."
+    - title: "Golden Path CI Templates"
+      cat: "Automation"
+      desc: "Authored a library of opinionated GitHub Actions workflow templates covering build, test, security scan, and deploy stages — adopted by 90% of product teams within one quarter."
+    - title: "SRE Charter & SLO Framework"
+      cat: "Leadership"
+      desc: "Defined the org-wide SRE charter, error budget policy, and SLO tooling stack using Prometheus and Sloth, shifting incident culture from reactive firefighting to proactive reliability."
+    - title: "Platform Reliability Review"
+      cat: "Leadership"
+      desc: "Introduced quarterly Production Readiness Reviews for all new services, catching 34 reliability gaps before launch across 12 teams in the first year of the programme."
+    - title: "Secrets Management Overhaul"
+      cat: "Infrastructure"
+      desc: "Replaced a scattered mix of .env files and SSM parameters with a centralised HashiCorp Vault cluster, enforcing dynamic secrets and lease rotation for all 200+ production services."
+    - title: "Ephemeral Preview Environments"
+      cat: "Automation"
+      desc: "Built a system to spin up full-stack preview environments per pull request using ArgoCD and DNS automation, eliminating shared staging contention and speeding QA cycles by 3x."
+
+  job1:
+    - title: "Kubernetes Platform Migration"
+      cat: "Infrastructure"
+      desc: "Led the 18-month migration of a 60-service Ruby monolith to microservices on EKS, establishing namespace conventions, RBAC policies, and network policies adopted across all teams."
+    - title: "CI/CD Platform Rebuild"
+      cat: "Automation"
+      desc: "Replaced a fragile Jenkins installation with a GitOps-driven pipeline platform on GitHub Actions and ArgoCD, reducing average deployment time from 45 minutes to under 8 minutes."
+    - title: "Incident Runbook Library"
+      cat: "Leadership"
+      desc: "Partnered with SREs to document 80+ incident runbooks in Confluence, linked directly from PagerDuty alerts, cutting mean time to resolution by 40% within two quarters."
+    - title: "Observability Stack Rollout"
+      cat: "Infrastructure"
+      desc: "Deployed a centralised observability platform using Prometheus, Grafana, and Loki across all production services, enabling engineers to self-serve dashboards and alert on SLOs."
+    - title: "Zero-Downtime Deploy Framework"
+      cat: "Automation"
+      desc: "Engineered a blue-green deployment framework for stateful services, eliminating maintenance windows and enabling the business to deploy 12+ times per day with full rollback capability."
+    - title: "On-Call Programme Redesign"
+      cat: "Leadership"
+      desc: "Restructured the on-call rotation across 5 squads, introduced severity tiers, and ran blameless postmortem training — reducing alert fatigue and improving engineer satisfaction scores."
+
+  job2:
+    - title: "AWS Landing Zone"
+      cat: "Infrastructure"
+      desc: "Designed and deployed a multi-account AWS Landing Zone using Control Tower and Terraform, providing guardrails, centralised logging, and account vending for all product teams."
+    - title: "Terraform Module Library"
+      cat: "Automation"
+      desc: "Built a company-wide Terraform module registry covering VPCs, RDS, ECS, and ALBs, reducing infrastructure definition boilerplate by 70% and enforcing tagging and security defaults."
+    - title: "CI Pipeline Standardisation"
+      cat: "Automation"
+      desc: "Standardised all 40-engineer CI pipelines onto GitLab CI with shared templates, cutting pipeline configuration drift and reducing average build times from 22 minutes to 9 minutes."
+    - title: "Docker Migration"
+      cat: "Infrastructure"
+      desc: "Containerised 14 legacy Python and Node services using Docker and Docker Compose, paving the way for ECS adoption and eliminating environment-specific deployment failures."
+    - title: "On-Call Alerting Cleanup"
+      cat: "Leadership"
+      desc: "Audited 500+ CloudWatch alarms, eliminating 60% as noisy or redundant, and rewrote the remainder with actionable runbook links, reducing on-call pages per week by half."
+    - title: "Deployment Frequency Metrics"
+      cat: "Leadership"
+      desc: "Instrumented the CI/CD pipeline to track DORA metrics, providing the engineering leadership team with weekly deploy frequency and change failure rate dashboards for the first time."
+    - title: "Secrets Rotation Automation"
+      cat: "Automation"
+      desc: "Automated RDS and API key rotation using AWS Secrets Manager and Lambda, removing all hardcoded credentials from application config and achieving compliance with SOC 2 requirements."
+
+  job3:
+    - title: "Containerisation Initiative"
+      cat: "Infrastructure"
+      desc: "Containerised a 12-service PHP monolith using Docker, introducing a local dev environment matching production for the first time and eliminating 'works on my machine' failures."
+    - title: "Jenkins to GitLab CI"
+      cat: "Automation"
+      desc: "Migrated all build and deploy jobs from a fragile Jenkins server to GitLab CI pipelines, cutting pipeline maintenance overhead by 80% and enabling developers to own their own pipelines."
+    - title: "Ansible Server Provisioning"
+      cat: "Automation"
+      desc: "Replaced manual server setup runbooks with Ansible playbooks covering base hardening, software installation, and app deployment, reducing provisioning time from 4 hours to under 10 minutes."
+    - title: "Deployment Runbook Automation"
+      cat: "Automation"
+      desc: "Converted a 40-step manual deployment runbook into a single shell script, removing human error from releases and cutting deployment time from 2 hours to 12 minutes."
+    - title: "Log Aggregation Setup"
+      cat: "Infrastructure"
+      desc: "Deployed a centralised ELK stack for log aggregation across all services, giving developers and support staff searchable, real-time access to production logs for the first time."
+    - title: "Staging Parity Project"
+      cat: "Leadership"
+      desc: "Led a cross-team effort to bring staging infrastructure to parity with production, reducing environment-specific bugs that reached production by 65% over the following two quarters."
+
+  job4:
+    - title: "Internal Deploy Tool"
+      cat: "Development"
+      desc: "Built a Python CLI tool that wrapped Fabric and AWS CLI to standardise deployments across 8 services, eliminating ad-hoc SSH sessions and giving the team a consistent deploy workflow."
+    - title: "Jenkins Pipeline Library"
+      cat: "Automation"
+      desc: "Authored a Jenkins shared library in Groovy covering build, test, and deploy stages, reducing per-project pipeline configuration from 200 lines to under 20."
+    - title: "Monitoring Dashboard"
+      cat: "Development"
+      desc: "Built a Flask web app that pulled from Datadog and PagerDuty APIs to display live service health, on-call schedule, and recent incidents on a shared team dashboard."
+    - title: "Database Migration Framework"
+      cat: "Development"
+      desc: "Designed a lightweight Python migration framework for the team's PostgreSQL schemas, adding rollback support and migration history tracking that replaced a hand-rolled SQL script folder."
+    - title: "AWS Cost Alerting"
+      cat: "Automation"
+      desc: "Wrote Lambda functions to monitor AWS spending per service tag and post weekly cost digests to Slack, giving the team's first visibility into per-service cloud spend."
+    - title: "Onboarding Automation"
+      cat: "Automation"
+      desc: "Built a Python script to automate new-engineer setup — GitHub access, AWS IAM roles, Slack channels, and local dev environment bootstrapping — reducing onboarding time from a day to under an hour."
+
+  job5:
+    - title: "Rails Performance Overhaul"
+      cat: "Development"
+      desc: "Profiled and optimised a slow Rails billing module using Rack Mini Profiler and database query analysis, reducing average response time from 1,800ms to 210ms for the highest-traffic endpoint."
+    - title: "API Rate Limiting"
+      cat: "Development"
+      desc: "Implemented token-bucket rate limiting on the public REST API using Redis, protecting backend services from abusive clients and reducing downstream database load by 35%."
+    - title: "Automated QA Pipeline"
+      cat: "Automation"
+      desc: "Built a CircleCI pipeline that ran RSpec and Capybara suites on every pull request, eliminating manual QA regression cycles and catching 3 critical bugs before they reached staging."
+    - title: "Heroku to EC2 Migration"
+      cat: "Infrastructure"
+      desc: "Planned and executed the migration of all production services from Heroku to EC2 with Nginx and Puma, reducing monthly infrastructure cost by 60% and improving p99 latency."
+    - title: "Feature Flag System"
+      cat: "Development"
+      desc: "Built a lightweight feature flag service backed by Redis, enabling product and engineering to roll out features to percentage cohorts without deployments."
+    - title: "Deployment Bash Toolkit"
+      cat: "Automation"
+      desc: "Wrote a set of Bash scripts to automate zero-downtime Capistrano deployments, database backups, and rollbacks, giving the 8-person team a reliable release process for the first time."
+
+  job6:
+    - title: "Linux Patch Automation"
+      cat: "Automation"
+      desc: "Wrote Bash and cron-based automation to schedule and apply OS patches across 80+ Linux servers for 12 clients, reducing manual patching effort by 90% and eliminating missed patch windows."
+    - title: "Backup & Recovery Overhaul"
+      cat: "Infrastructure"
+      desc: "Replaced ad-hoc rsync scripts with a centralised Bacula backup solution covering all client servers, with weekly restore tests documented in a recovery runbook."
+    - title: "Nagios Monitoring Rollout"
+      cat: "Infrastructure"
+      desc: "Deployed Nagios Core across the client fleet with custom checks for disk, CPU, memory, and service health, giving the team proactive alerting and eliminating surprise outages."
+    - title: "Active Directory Standardisation"
+      cat: "Infrastructure"
+      desc: "Standardised Group Policy and OU structure across 6 client Active Directory environments, reducing login issues and enforcing consistent security baselines across the portfolio."
+    - title: "Helpdesk Ticketing System"
+      cat: "Leadership"
+      desc: "Implemented osTicket for the 5-person team, replacing email-based support with a tracked queue, cutting average response time from 6 hours to 90 minutes within the first month."
+    - title: "Network Documentation Sprint"
+      cat: "Leadership"
+      desc: "Led a two-week effort to document network topology, firewall rules, and server inventory for all 12 clients using draw.io and Confluence, creating a living knowledge base for the team."
+    - title: "VPN Rollout for Remote Staff"
+      cat: "Infrastructure"
+      desc: "Deployed OpenVPN servers for 4 clients with split-tunnel configuration and certificate-based auth, enabling secure remote access for 60+ staff during a rapid shift to remote work."
+
+  demos:
+    - title: "Platform Health Dashboard"
+      cat: "Automation"
+      desc: "A live demo of the internal developer platform health dashboard, aggregating deployment frequency, SLO burn rate, and on-call load across all teams in real time."
+    - title: "Terraform Drift Detector"
+      cat: "Infrastructure"
+      desc: "A demo tool that runs terraform plan across all workspaces on a schedule and posts drift reports to Slack, keeping infrastructure state honest without manual intervention."
+    - title: "Cost Anomaly Notifier"
+      cat: "Automation"
+      desc: "A Lambda-powered demo that detects abnormal AWS spend spikes using statistical thresholds and routes alerts to the owning team's Slack channel within minutes of detection."
+    </script>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        /* ── Parse resume data from embedded YAML script tag ── */
+        const useResumeData = () => {
+            const [data, setData] = useState(null);
+            const [error, setError] = useState(null);
+
+            useEffect(() => {
+                try {
+                    const yamlText = document.getElementById('resume-data').textContent;
+                    const parsed = jsyaml.load(yamlText);
+                    const c = parsed.candidate || {};
+                    setData({
+                        experiences: parsed.experience || [],
+                        projectDataMap: parsed.projects || {},
+                        showDemos: parsed.show_demos !== false,
+                        candidate: {
+                            name:        c.name        || '',
+                            description: c.description || '',
+                            email:       c.email       || '',
+                            linkedin:    c.linkedin    || '',
+                            github:      c.github      || '',
+                        },
+                    });
+                } catch (err) {
+                    setError(err.message);
+                }
+            }, []);
+
+            return { data, error };
+        };
+
+/* ── Slide background palette — cycles for any number of jobs ── */
+        const SLIDE_PALETTES = [
+            // Each entry defines the background style for one carousel card slot.
+            // Cards cycle through this list automatically (index % length), so
+            // adding or removing jobs never requires touching this array.
+            //
+            // Each entry has:
+            //   grad  — one or more CSS gradient/image layers (comma-separated string)
+            //   size  — optional backgroundSize string; omit ("") to use "auto"
+            //
+            // To add a new style: append a new { grad, size } object below.
+            // To change a style: edit the rgba() color values or gradient geometry.
+
+            // 1. amber + square grid
+            { grad: 'radial-gradient(ellipse 110% 80% at 95% 10%, rgba(251,191,36,0.28) 0%, transparent 70%), linear-gradient(rgba(251,191,36,0.13) 1px, transparent 1px), linear-gradient(90deg, rgba(251,191,36,0.13) 1px, transparent 1px)', size: '100% 100%, 28px 28px, 28px 28px' },
+            // 2. teal + graph-paper (horizontal + vertical repeating lines)
+            { grad: 'radial-gradient(ellipse 90% 65% at 90% 15%, rgba(20,184,166,0.26) 0%, transparent 65%), radial-gradient(ellipse 52% 52% at 10% 85%, rgba(20,184,166,0.16) 0%, transparent 60%), repeating-linear-gradient(0deg, transparent, transparent 23px, rgba(20,184,166,0.13) 23px, rgba(20,184,166,0.13) 24px), repeating-linear-gradient(90deg, transparent, transparent 47px, rgba(20,184,166,0.13) 47px, rgba(20,184,166,0.13) 48px)', size: '' },
+            // 3. purple + triple radial blobs
+            { grad: 'radial-gradient(ellipse 72% 72% at 88% 12%, rgba(139,92,246,0.28) 0%, transparent 60%), radial-gradient(ellipse 46% 46% at 15% 80%, rgba(139,92,246,0.18) 0%, transparent 55%), radial-gradient(ellipse 26% 26% at 60% 90%, rgba(139,92,246,0.13) 0%, transparent 50%)', size: '' },
+            // 4. blue + diagonal stripe (-45°)
+            { grad: 'radial-gradient(ellipse 85% 58% at 92% 8%, rgba(59,130,246,0.24) 0%, transparent 60%), repeating-linear-gradient(-45deg, transparent, transparent 14px, rgba(59,130,246,0.10) 14px, rgba(59,130,246,0.10) 15px)', size: '' },
+            // 5. green + vertical lines
+            { grad: 'radial-gradient(ellipse 95% 70% at 92% 8%, rgba(5,150,105,0.26) 0%, transparent 65%), radial-gradient(ellipse 45% 45% at 8% 90%, rgba(5,150,105,0.14) 0%, transparent 55%), repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(5,150,105,0.10) 38px, rgba(5,150,105,0.10) 39px)', size: '' },
+            // 6. rose + diagonal stripe (45°) with triple blobs
+            { grad: 'radial-gradient(ellipse 100% 75% at 92% 8%, rgba(244,63,94,0.28) 0%, transparent 65%), radial-gradient(ellipse 55% 55% at 8% 85%, rgba(244,63,94,0.16) 0%, transparent 60%), radial-gradient(ellipse 30% 30% at 55% 95%, rgba(244,63,94,0.11) 0%, transparent 55%), repeating-linear-gradient(45deg, transparent, transparent 18px, rgba(244,63,94,0.06) 18px, rgba(244,63,94,0.06) 19px)', size: '' },
+            // 7. indigo + fine square grid (matches the Demos ribbon card style)
+            { grad: 'radial-gradient(ellipse 110% 80% at 50% 10%, rgba(99,102,241,0.25) 0%, transparent 70%), linear-gradient(rgba(99,102,241,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.12) 1px, transparent 1px)', size: '100% 100%, 18px 18px, 18px 18px' },
+            // 8. orange + dot-grid
+            { grad: 'radial-gradient(ellipse 100% 70% at 90% 10%, rgba(234,88,12,0.26) 0%, transparent 65%), radial-gradient(ellipse 50% 50% at 12% 88%, rgba(234,88,12,0.14) 0%, transparent 55%), radial-gradient(circle, rgba(234,88,12,0.18) 1px, transparent 1px), radial-gradient(circle, rgba(234,88,12,0.18) 1px, transparent 1px)', size: '100% 100%, 100% 100%, 22px 22px, 22px 22px' },
+            // 9. cyan + diagonal dash (60°)
+            { grad: 'radial-gradient(ellipse 80% 60% at 85% 15%, rgba(6,182,212,0.28) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 20% 75%, rgba(6,182,212,0.16) 0%, transparent 50%), radial-gradient(ellipse 60% 60% at 50% 50%, rgba(6,182,212,0.08) 0%, transparent 70%), repeating-linear-gradient(60deg, transparent, transparent 20px, rgba(6,182,212,0.10) 20px, rgba(6,182,212,0.10) 21px)', size: '' },
+        ];
+        const getSlideStyle = (index) => {
+            const p = SLIDE_PALETTES[index % SLIDE_PALETTES.length];
+            const style = { backgroundImage: p.grad };
+            if (p.size) style.backgroundSize = p.size;
+            return style;
+        };
+
+        /* ── Experience carousel ── */
+        const Experience = ({ experiences, current, setCurrent, animClass, setAnimClass }) => {
+            const total = experiences.length;
+            const goTo = (index) => {
+                if (index === current) return;
+                setAnimClass(index > current ? 'fade-right' : 'fade-left');
+                setTimeout(() => { setCurrent(index); setAnimClass(''); }, 300);
+            };
+
+            const exp = experiences[current];
+
+            return (
+                <div className="carousel-section">
+                    <h2 className="section-title">Experience</h2>
+                    <div className={`carousel-container ${animClass}`}>
+                        <div className="carousel-card" style={getSlideStyle(current)} data-slide={current}>
+                                <div className="progress-bars">
+                                    {experiences.map((_, i) => (
+                                        <div key={i} className={`progress-bar ${i === current ? 'active' : ''}`} />
+                                    ))}
+                                </div>
+                                <div className="card-body">
+                                    <div className="card-info">
+                                        <h3>{exp.title}</h3>
+                                        <p className="card-meta">
+                                            <span className="card-company">{exp.company}</span>
+                                            <span className="card-period">{exp.period}</span>
+                                        </p>
+                                        <p className="card-desc">{exp.description}</p>
+                                    </div>
+                                    <span className="card-counter">{String(current + 1).padStart(2, '0')}</span>
+                                </div>
+                        </div>
+                    </div>
+
+                    <div className="carousel-controls">
+                        <button className="carousel-arrow" onClick={() => goTo((current - 1 + total) % total)}>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </button>
+                        <div className="carousel-dots">
+                            {experiences.map((_, i) => (
+                                <button key={i} className={`carousel-dot ${i === current ? 'active' : ''}`} onClick={() => goTo(i)}>{i + 1}</button>
+                            ))}
+                        </div>
+                        <button className="carousel-arrow" onClick={() => goTo((current + 1) % total)}>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        /* ── Project detail modal ── */
+        const ProjectModal = ({ project, onClose }) => {
+            useEffect(() => {
+                const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+                document.addEventListener('keydown', onKey);
+                return () => document.removeEventListener('keydown', onKey);
+            }, [onClose]);
+
+            return (
+                <div className="modal-backdrop" onClick={onClose}>
+                    <div className="modal-card" onClick={e => e.stopPropagation()}>
+                        <button className="modal-close" onClick={onClose} aria-label="Close">&#x2715;</button>
+                        <p className="modal-cat">{project.cat}</p>
+                        <p className="modal-title">{project.title}</p>
+                        <p className="modal-desc">{project.desc}</p>
+                    </div>
+                </div>
+            );
+        };
+
+        /* ── Featured Projects ── */
+        const Projects = ({ projectDataMap, activeIndex, experiences }) => {
+            const [filter, setFilter] = useState('All');
+            const [selectedProject, setSelectedProject] = useState(null);
+            const projectKey = experiences[activeIndex]?.id || `job${activeIndex}`;
+            const projects = projectDataMap[projectKey] || [];
+
+            // Derive categories directly from the current job's projects so the
+            // filter bar always stays in sync — no manual YAML list required.
+            // Insertion-order is preserved; duplicates are removed via Set.
+            const categories = ['All', ...new Set(projects.map(p => p.cat).filter(Boolean))];
+
+            // Reset filter to 'All' whenever the active job changes so a stale
+            // category selection never produces an empty grid.
+            useEffect(() => { setFilter('All'); }, [projectKey]);
+
+            const filtered = filter === 'All' ? projects : projects.filter(p => p.cat === filter);
+
+            return (
+                <div className="projects-section">
+                    <h2 className="section-title">Featured Projects</h2>
+                    <div className="filter-bar">
+                        {categories.map(c => (
+                            <button key={c} className={`filter-btn ${filter === c ? 'active' : ''}`} onClick={() => setFilter(c)}>{c}</button>
+                        ))}
+                    </div>
+                    <div className="project-grid" key={projectKey}>
+                        {filtered.map((p, idx) => (
+                            <div key={idx} className="project-card" onClick={() => setSelectedProject(p)}>
+                                <p className="project-cat">{p.cat}</p>
+                                <p className="project-name">{p.title}</p>
+                                <p className="project-click-hint">Click to learn more</p>
+                            </div>
+                        ))}
+                    </div>
+                    {selectedProject && (
+                        <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+                    )}
+                </div>
+            );
+        };
+
+        /* ── Root App ── */
+        const App = () => {
+            const { data, error } = useResumeData();
+            const [current, setCurrent] = useState(0);
+            const [animClass, setAnimClass] = useState('');
+            const [darkMode, setDarkMode] = useState(false);
+
+            useEffect(() => {
+                document.documentElement.classList.toggle('dark', darkMode);
+            }, [darkMode]);
+
+            const renderBody = () => {
+                if (error) {
+                    return (
+                        <div className="error-state">
+                            <strong>Failed to load resume data:</strong> {error}<br/>
+                            <small>There is a problem parsing the embedded YAML data in this file. Check the <code>&lt;script type="text/yaml"&gt;</code> block for syntax errors.</small>
+                        </div>
+                    );
+                }
+                if (!data) {
+                    return (
+                        <div className="loading-state">
+                            <div className="loading-spinner" />
+                            Loading resume data…
+                        </div>
+                    );
+                }
+                return (
+                    <>
+                        <Experience
+                            experiences={data.experiences}
+                            current={current}
+                            setCurrent={setCurrent}
+                            animClass={animClass}
+                            setAnimClass={setAnimClass}
+                        />
+                        <Projects
+                            projectDataMap={data.projectDataMap}
+                            activeIndex={current}
+                            experiences={data.experiences}
+                        />
+                    </>
+                );
+            };
+
+            const c = data?.candidate || {};
+
+            return (
+                <div className="page">
+                    <header>
+                        <div className="header-left">
+                            {c.email    && <a href={`mailto:${c.email}`} className="contact-link link-email">📧 Email</a>}
+                            {c.linkedin && <a href={c.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link link-linkedin">💼 LinkedIn</a>}
+                            {c.github   && <a href={c.github}   target="_blank" rel="noopener noreferrer" className="contact-link link-github">🖥️ GitHub</a>}
+                        </div>
+                        <div className="header-right">
+                            <button className="dark-toggle" onClick={() => setDarkMode(!darkMode)}>{darkMode ? '☀️' : '🌙'}</button>
+                            {data && data.showDemos && (
+                                <a href="demos.html" className="demos-ribbon">
+                                    <span className="ribbon-text">Demos!</span>
+                                </a>
+                            )}
+                        </div>
+                        <h1>{c.name || 'Resume'}</h1>
+                        <p>{c.description || 'Interactive Digital Resume'}</p>
+                    </header>
+                    {renderBody()}
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Demos | Delsin T Mills</title>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-page:        #f2f2f2;
+            --bg-card:        #ffffff;
+            --border:         #e2e8f0;
+            --text-primary:   #0f172a;
+            --text-secondary: #475569;
+            --text-muted:     #94a3b8;
+            --accent:         #4f46e5;
+            --accent-light:   #e0e7ff;
+            --btn-bg:         #f1f5f9;
+            --btn-border:     #e2e8f0;
+            --btn-text:       #475569;
+        }
+
+        html.dark {
+            --bg-page:        #0f172a;
+            --bg-card:        #1e293b;
+            --border:         #334155;
+            --text-primary:   #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted:     #64748b;
+            --accent:         #818cf8;
+            --btn-bg:         #334155;
+            --btn-border:     #475569;
+            --btn-text:       #cbd5e1;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .page { max-width: 768px; margin: 0 auto; padding: 48px 24px; }
+
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 40px; 
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dark-toggle {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: none; background: var(--btn-bg);
+            cursor: pointer; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .title-section { margin-bottom: 32px; }
+        .title-section h1 { font-size: 2rem; font-weight: 800; }
+        .title-section p { color: var(--text-secondary); margin-top: 8px; }
+
+        .demo-list { display: flex; flex-direction: column; gap: 20px; }
+
+        .demo-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .demo-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .demo-card h3 { font-size: 1.25rem; margin-bottom: 8px; }
+        .demo-card p { color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; }
+        
+        .demo-footer {
+            margin-top: 16px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .badge {
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const demoData = [
+            {
+                name: "Okta Workflow Bot V4",
+                category: "Automation",
+                description: "A Python-based automation that monitors Okta logs for suspicious API calls and triggers Slack alerts with one-click remediation buttons for the Security team.",
+                stack: ["Python", "Okta API", "AWS Lambda"]
+            },
+            {
+                name: "Live Data Parser Prototype",
+                category: "Technical",
+                description: "A React-based utility that parses raw JSON infrastructure exports into readable CSV/Excel formats for executive cost-reporting and compliance audits.",
+                stack: ["React", "Node.js", "Tailwind"]
+            },
+            {
+                name: "CI/CD Pipeline Visualizer",
+                category: "DevOps",
+                description: "Real-time dashboard visualizer for Terraform deployments across multiple AWS environments, showing build status and infrastructure drift detection.",
+                stack: ["Terraform", "GitHub Actions", "Webhooks"]
+            },
+            {
+                name: "Fleet Compliance Audit Tool",
+                category: "Management",
+                description: "Automated hardware lifecycle tracking tool that cross-references Jamf Pro data with procurement records to identify aging assets and non-compliant devices.",
+                stack: ["Jamf API", "SQL", "Google Apps Script"]
+            }
+        ];
+
+        const App = () => {
+            const [darkMode, setDarkMode] = useState(false);
+
+            useEffect(() => {
+                document.documentElement.classList.toggle('dark', darkMode);
+            }, [darkMode]);
+
+            return (
+                <div className="page">
+                    <header>
+                        <a href="index.html" className="back-link">
+                            ← Back to Resume
+                        </a>
+                        <button className="dark-toggle" onClick={() => setDarkMode(!darkMode)}>
+                            {darkMode ? '☀️' : '🌙'}
+                        </button>
+                    </header>
+
+                    <div className="title-section">
+                        <h1>Technical Demos</h1>
+                        <p>A collection of prototypes, workflow automations, and lab environments built to solve operational challenges.</p>
+                    </div>
+
+                    <div className="demo-list">
+                        {demoData.map((demo, idx) => (
+                            <div key={idx} className="demo-card">
+                                <span className="demo-tag">{demo.category}</span>
+                                <h3>{demo.name}</h3>
+                                <p>{demo.description}</p>
+                                <div className="demo-footer">
+                                    {demo.stack.map((tech, i) => (
+                                        <span key={i} className="badge">{tech}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
