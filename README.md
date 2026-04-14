@@ -120,14 +120,14 @@ Jobs are displayed in a carousel, in the order they appear in this list.
 
 ---
 
-### 3. `show_demos` — Demos Ribbon
+### 3. `show_demos` — Demos Button
 
 ```yaml
-show_demos: true   # show the ribbon
-show_demos: false  # hide the ribbon
+show_demos: true   # show the button
+show_demos: false  # hide the button
 ```
 
-Controls whether the **Demos!** bookmark ribbon appears in the top-right corner of the page. It links to `demos.html`, which must exist in the same folder as `index.html` for the link to work. Defaults to `true` if omitted.
+Controls whether the **Demos!** button appears in the top-left corner of the page. It links to `demos.html`, which must exist in the same folder as `index.html` for the link to work. Defaults to `true` if omitted.
 
 ---
 
