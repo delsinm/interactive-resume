@@ -5,13 +5,12 @@
 
   HOW TO UPDATE THIS RESUME
   --------------------------
-  All content is stored in the DATA object inside the <script> block near
-  the bottom of this file (search for "const D = {" to jump there).
+  All content is stored in a YAML block embedded in this file.
   You do NOT need a web server — just open index.html in any browser.
 
   FIND THE DATA
   -------------
-  Search for "const D = {" to jump straight to the data object.
+  Search for '<script type="text/yaml"' to jump straight to the data block.
   It has four sections:
 
     1. candidate
@@ -23,10 +22,10 @@
          github      - if present, shows a GitHub link
        Omit or leave blank any of email / linkedin / github to hide that link.
 
-    2. showDemos
+    2. show_demos
        Controls whether the "View Demos" button appears in the sidebar.
-         showDemos: true    — button is visible (default)
-         showDemos: false   — button is hidden
+         show_demos: true    — button is visible (default)
+         show_demos: false   — button is hidden
        NOTE: The button links to demos.html. That file must exist in the same
        folder as index.html for the link to work.
 
@@ -66,7 +65,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ash Ketchum — Resume</title>
+<title>Resume</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -85,10 +85,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .sidebar{width:var(--sw);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
 .sb-top{padding:36px 28px 28px;border-bottom:1px solid var(--border);position:relative}
 .sb-top::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent)}
-.avatar{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,#7a5c1e,var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--bg);margin-bottom:14px;box-shadow:0 0 0 3px var(--surface),0 0 0 4px var(--border)}
+.avatar{width:160px;height:160px;border-radius:50%;margin-bottom:14px;box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--gold);overflow:hidden;flex-shrink:0}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .sb-name{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.07em;line-height:1.1}
 .sb-role{font-size:.68rem;font-weight:500;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;margin-top:4px}
-.sb-links{display:flex;flex-direction:column;gap:5px;margin-top:14px}
+.sb-links{display:flex;flex-direction:column;gap:5px;margin-top:18px}
 .sb-link{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:4px;font-size:.72rem;color:var(--t2);text-decoration:none;border:1px solid transparent;transition:all .2s}
 .sb-link:hover{color:var(--gold);background:var(--gold-dim);border-color:rgba(201,168,76,.2)}
 .sb-link svg{flex-shrink:0;opacity:.55}
@@ -196,8 +197,6 @@ body.dark{--bg:#0d0d0f;--surface:#131316;--card:#18181d;--card2:#1e1e25;--border
   <aside class="sidebar">
     <div class="sb-top">
       <div class="avatar" id="sb-avatar"></div>
-      <div class="sb-name" id="sb-name"></div>
-      <div class="sb-role" id="sb-role"></div>
       <div class="sb-links" id="sb-links"></div>
       <div id="sb-bottom" style="display:none;margin-top:10px">
         <a href="demos.html" class="demos-pill">✦ View Demos</a>
@@ -247,81 +246,243 @@ body.dark{--bg:#0d0d0f;--surface:#131316;--card:#18181d;--card2:#1e1e25;--border
     <p class="m-desc" id="m-desc"></p>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     RESUME DATA — edit this YAML block to update all resume content
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script type="text/yaml" id="resume-data">
+# Candidate info — name and description are required; contact links are optional.
+# Omit (or leave blank) any of email, linkedin, or github to hide that link.
+candidate:
+  name: "Ash Ketchum"
+  description: "Staff DevOps Engineer & Pokémon Master"
+  email: "ash@catchmall.io"
+  linkedin: "https://linkedin.com/in/ashketchum"
+  github: "https://github.com/ashketchum"
+  headshot: true  # set to false to hide the headshot and collapse the space (requires "headshot.jpg" or "headshot.png" in the same folder as index.html)
+
+# Set to false to hide the "View Demos" button in the sidebar (requires demos.html)
+show_demos: true
+
+experience:
+  - id: "job0"
+    title: "Staff DevOps Engineer"
+    company: "Catch'm All, Inc."
+    period: "2022 – Present"
+    description: "Leading platform engineering strategy for a 400-engineer org, owning the developer platform, SRE practice, and cloud cost governance across three cloud providers."
+
+  - id: "job1"
+    title: "Senior DevOps Engineer"
+    company: "Silph Co."
+    period: "2019 – 2022"
+    description: "Designed and operated the CI/CD platform serving 150+ engineers, migrated a monolith to microservices on Kubernetes, and reduced P0 incident frequency by 70%."
+
+  - id: "job2"
+    title: "DevOps Engineer"
+    company: "Celadon Game Corner Tech"
+    period: "2017 – 2019"
+    description: "Built cloud infrastructure and deployment pipelines on AWS using Terraform and Ansible, supporting a team of 40 engineers shipping a SaaS analytics product."
+
+  - id: "job3"
+    title: "DevOps Engineer"
+    company: "Viridian Gym Solutions"
+    period: "2015 – 2017"
+    description: "Introduced containerisation and automated deployments to a legacy PHP stack, cutting release cycle from bi-weekly to daily and eliminating manual server provisioning."
+
+  - id: "job4"
+    title: "Junior Software Engineer"
+    company: "Brock's Pewter Analytics"
+    period: "2013 – 2015"
+    description: "Developed internal tooling and REST APIs in Python and Go, and acted as the team's informal build-and-release owner, scripting deploys and maintaining Jenkins pipelines."
+
+  - id: "job5"
+    title: "Software Engineer"
+    company: "Cascade Badge Software"
+    period: "2011 – 2013"
+    description: "Built customer-facing web features in Ruby on Rails and maintained MySQL schemas, while automating repetitive QA and provisioning tasks to improve team velocity."
+
+  - id: "job6"
+    title: "Systems Administrator"
+    company: "Oak's Pallet Lab IT"
+    period: "2009 – 2011"
+    description: "Administered Linux and Windows servers for 12 SMB clients, managed backups, patching, and network infrastructure, and wrote Bash scripts to automate routine maintenance tasks."
+
+# Projects are keyed by experience id ("job0", "job1", …)
+projects:
+  job0:
+    - title: "Internal Developer Platform"
+      cat: "Infrastructure"
+      desc: "Designed and launched an IDP built on Backstage, giving 400+ engineers self-service access to environments, runbooks, and ownership data — reducing platform team ticket volume by 55%."
+    - title: "Multi-Cloud Cost Governance"
+      cat: "Leadership"
+      desc: "Established a FinOps practice across AWS, GCP, and Azure, implementing tagging standards, budget alerting, and quarterly cost reviews that recovered $1.2M in annual cloud waste."
+    - title: "Golden Path CI Templates"
+      cat: "Automation"
+      desc: "Authored a library of opinionated GitHub Actions workflow templates covering build, test, security scan, and deploy stages — adopted by 90% of product teams within one quarter."
+    - title: "SRE Charter & SLO Framework"
+      cat: "Leadership"
+      desc: "Defined the org-wide SRE charter, error budget policy, and SLO tooling stack using Prometheus and Sloth, shifting incident culture from reactive firefighting to proactive reliability."
+    - title: "Platform Reliability Review"
+      cat: "Leadership"
+      desc: "Introduced quarterly Production Readiness Reviews for all new services, catching 34 reliability gaps before launch across 12 teams in the first year of the programme."
+    - title: "Secrets Management Overhaul"
+      cat: "Infrastructure"
+      desc: "Replaced a scattered mix of .env files and SSM parameters with a centralised HashiCorp Vault cluster, enforcing dynamic secrets and lease rotation for all 200+ production services."
+    - title: "Ephemeral Preview Environments"
+      cat: "Automation"
+      desc: "Built a system to spin up full-stack preview environments per pull request using ArgoCD and DNS automation, eliminating shared staging contention and speeding QA cycles by 3×."
+
+  job1:
+    - title: "Kubernetes Platform Migration"
+      cat: "Infrastructure"
+      desc: "Led the 18-month migration of a 60-service Ruby monolith to microservices on EKS, establishing namespace conventions, RBAC policies, and network policies adopted across all teams."
+    - title: "CI/CD Platform Rebuild"
+      cat: "Automation"
+      desc: "Replaced a fragile Jenkins installation with a GitOps-driven pipeline platform on GitHub Actions and ArgoCD, reducing average deployment time from 45 minutes to under 8 minutes."
+    - title: "Incident Runbook Library"
+      cat: "Leadership"
+      desc: "Partnered with SREs to document 80+ incident runbooks in Confluence, linked directly from PagerDuty alerts, cutting mean time to resolution by 40% within two quarters."
+    - title: "Observability Stack Rollout"
+      cat: "Infrastructure"
+      desc: "Deployed a centralised observability platform using Prometheus, Grafana, and Loki across all production services, enabling engineers to self-serve dashboards and alert on SLOs."
+    - title: "Zero-Downtime Deploy Framework"
+      cat: "Automation"
+      desc: "Engineered a blue-green deployment framework for stateful services, eliminating maintenance windows and enabling the business to deploy 12+ times per day with full rollback capability."
+    - title: "On-Call Programme Redesign"
+      cat: "Leadership"
+      desc: "Restructured the on-call rotation across 5 squads, introduced severity tiers, and ran blameless postmortem training — reducing alert fatigue and improving engineer satisfaction scores."
+
+  job2:
+    - title: "AWS Landing Zone"
+      cat: "Infrastructure"
+      desc: "Designed and deployed a multi-account AWS Landing Zone using Control Tower and Terraform, providing guardrails, centralised logging, and account vending for all product teams."
+    - title: "Terraform Module Library"
+      cat: "Automation"
+      desc: "Built a company-wide Terraform module registry covering VPCs, RDS, ECS, and ALBs, reducing infrastructure definition boilerplate by 70% and enforcing tagging and security defaults."
+    - title: "CI Pipeline Standardisation"
+      cat: "Automation"
+      desc: "Standardised all 40-engineer CI pipelines onto GitLab CI with shared templates, cutting pipeline configuration drift and reducing average build times from 22 to 9 minutes."
+    - title: "Docker Migration"
+      cat: "Infrastructure"
+      desc: "Containerised 14 legacy Python and Node services using Docker and Docker Compose, paving the way for ECS adoption and eliminating environment-specific deployment failures."
+    - title: "On-Call Alerting Cleanup"
+      cat: "Leadership"
+      desc: "Audited 500+ CloudWatch alarms, eliminating 60% as noisy or redundant, and rewrote the remainder with actionable runbook links, reducing on-call pages per week by half."
+    - title: "Secrets Rotation Automation"
+      cat: "Automation"
+      desc: "Automated RDS and API key rotation using AWS Secrets Manager and Lambda, removing all hardcoded credentials from application config and achieving SOC 2 compliance."
+
+  job3:
+    - title: "Containerisation Initiative"
+      cat: "Infrastructure"
+      desc: "Containerised a 12-service PHP monolith using Docker, introducing a local dev environment matching production and eliminating 'works on my machine' failures."
+    - title: "Jenkins to GitLab CI"
+      cat: "Automation"
+      desc: "Migrated all build and deploy jobs from a fragile Jenkins server to GitLab CI pipelines, cutting pipeline maintenance overhead by 80%."
+    - title: "Ansible Server Provisioning"
+      cat: "Automation"
+      desc: "Replaced manual server setup runbooks with Ansible playbooks, reducing provisioning time from 4 hours to under 10 minutes."
+    - title: "Deployment Runbook Automation"
+      cat: "Automation"
+      desc: "Converted a 40-step manual deployment runbook into a single shell script, cutting deployment time from 2 hours to 12 minutes."
+    - title: "Log Aggregation Setup"
+      cat: "Infrastructure"
+      desc: "Deployed a centralised ELK stack for log aggregation across all services, giving developers and support staff searchable, real-time access to production logs."
+    - title: "Staging Parity Project"
+      cat: "Leadership"
+      desc: "Led a cross-team effort to bring staging infrastructure to parity with production, reducing environment-specific bugs reaching production by 65%."
+
+  job4:
+    - title: "Internal Deploy Tool"
+      cat: "Development"
+      desc: "Built a Python CLI tool that wrapped Fabric and AWS CLI to standardise deployments across 8 services, eliminating ad-hoc SSH sessions."
+    - title: "Jenkins Pipeline Library"
+      cat: "Automation"
+      desc: "Authored a Jenkins shared library in Groovy covering build, test, and deploy stages, reducing per-project pipeline configuration from 200 lines to under 20."
+    - title: "Monitoring Dashboard"
+      cat: "Development"
+      desc: "Built a Flask web app pulling from Datadog and PagerDuty APIs to display live service health, on-call schedule, and recent incidents."
+    - title: "Database Migration Framework"
+      cat: "Development"
+      desc: "Designed a lightweight Python migration framework for PostgreSQL schemas, adding rollback support and migration history tracking."
+    - title: "AWS Cost Alerting"
+      cat: "Automation"
+      desc: "Wrote Lambda functions to monitor AWS spending per service tag and post weekly cost digests to Slack — the team's first per-service cloud spend visibility."
+    - title: "Onboarding Automation"
+      cat: "Automation"
+      desc: "Built a Python script to automate new-engineer setup — GitHub access, AWS IAM roles, Slack channels, and local dev bootstrapping — reducing onboarding from a day to under an hour."
+
+  job5:
+    - title: "Rails Performance Overhaul"
+      cat: "Development"
+      desc: "Profiled and optimised a slow Rails billing module, reducing average response time from 1,800 ms to 210 ms for the highest-traffic endpoint."
+    - title: "API Rate Limiting"
+      cat: "Development"
+      desc: "Implemented token-bucket rate limiting on the public REST API using Redis, protecting backend services and reducing downstream database load by 35%."
+    - title: "Automated QA Pipeline"
+      cat: "Automation"
+      desc: "Built a CircleCI pipeline running RSpec and Capybara suites on every pull request, eliminating manual QA regression cycles."
+    - title: "Heroku to EC2 Migration"
+      cat: "Infrastructure"
+      desc: "Planned and executed the migration of all production services from Heroku to EC2 with Nginx and Puma, reducing monthly infrastructure cost by 60%."
+    - title: "Feature Flag System"
+      cat: "Development"
+      desc: "Built a lightweight feature flag service backed by Redis, enabling percentage-cohort rollouts without deployments."
+    - title: "Deployment Bash Toolkit"
+      cat: "Automation"
+      desc: "Wrote Bash scripts to automate zero-downtime Capistrano deployments, database backups, and rollbacks."
+
+  job6:
+    - title: "Linux Patch Automation"
+      cat: "Automation"
+      desc: "Wrote Bash and cron-based automation to patch 80+ Linux servers for 12 clients, reducing manual effort by 90% and eliminating missed patch windows."
+    - title: "Backup & Recovery Overhaul"
+      cat: "Infrastructure"
+      desc: "Replaced ad-hoc rsync scripts with a centralised Bacula backup solution, with weekly restore tests documented in a recovery runbook."
+    - title: "Nagios Monitoring Rollout"
+      cat: "Infrastructure"
+      desc: "Deployed Nagios Core across the client fleet with custom checks for disk, CPU, memory, and service health, eliminating surprise outages."
+    - title: "Active Directory Standardisation"
+      cat: "Infrastructure"
+      desc: "Standardised Group Policy and OU structure across 6 client Active Directory environments, enforcing consistent security baselines."
+    - title: "Helpdesk Ticketing System"
+      cat: "Leadership"
+      desc: "Implemented osTicket for the 5-person team, cutting average response time from 6 hours to 90 minutes within the first month."
+    - title: "Network Documentation Sprint"
+      cat: "Leadership"
+      desc: "Led a two-week effort to document network topology, firewall rules, and server inventory for all 12 clients using draw.io and Confluence."
+    - title: "VPN Rollout for Remote Staff"
+      cat: "Infrastructure"
+      desc: "Deployed OpenVPN servers for 4 clients with split-tunnel config and certificate-based auth, enabling secure remote access for 60+ staff."
+</script>
+
 <script>
-/* ── DATA ── edit this section to update resume content ── */
-const D = {
-  candidate:{name:"Ash Ketchum",description:"Staff DevOps Engineer & Pokémon Master",email:"ash@catchmall.io",linkedin:"https://linkedin.com/in/ashketchum",github:"https://github.com/ashketchum"},
-  showDemos:true,
-  experience:[
-    {id:"job0",title:"Staff DevOps Engineer",company:"Catch'm All, Inc.",period:"2022 – Present",description:"Leading platform engineering strategy for a 400-engineer org, owning the developer platform, SRE practice, and cloud cost governance across three cloud providers."},
-    {id:"job1",title:"Senior DevOps Engineer",company:"Silph Co.",period:"2019 – 2022",description:"Designed and operated the CI/CD platform serving 150+ engineers, migrated a monolith to microservices on Kubernetes, and reduced P0 incident frequency by 70%."},
-    {id:"job2",title:"DevOps Engineer",company:"Celadon Game Corner Tech",period:"2017 – 2019",description:"Built cloud infrastructure and deployment pipelines on AWS using Terraform and Ansible, supporting a team of 40 engineers shipping a SaaS analytics product."},
-    {id:"job3",title:"DevOps Engineer",company:"Viridian Gym Solutions",period:"2015 – 2017",description:"Introduced containerisation and automated deployments to a legacy PHP stack, cutting release cycle from bi-weekly to daily and eliminating manual server provisioning."},
-    {id:"job4",title:"Junior Software Engineer",company:"Brock's Pewter Analytics",period:"2013 – 2015",description:"Developed internal tooling and REST APIs in Python and Go, and acted as the team's informal build-and-release owner, scripting deploys and maintaining Jenkins pipelines."},
-    {id:"job5",title:"Software Engineer",company:"Cascade Badge Software",period:"2011 – 2013",description:"Built customer-facing web features in Ruby on Rails and maintained MySQL schemas, while automating repetitive QA and provisioning tasks to improve team velocity."},
-    {id:"job6",title:"Systems Administrator",company:"Oak's Pallet Lab IT",period:"2009 – 2011",description:"Administered Linux and Windows servers for 12 SMB clients, managed backups, patching, and network infrastructure, and wrote Bash scripts to automate routine maintenance tasks."},
-  ],
-  projects:{
-    job0:[
-      {title:"Internal Developer Platform",cat:"Infrastructure",desc:"Designed and launched an IDP built on Backstage, giving 400+ engineers self-service access to environments, runbooks, and ownership data — reducing platform team ticket volume by 55%."},
-      {title:"Multi-Cloud Cost Governance",cat:"Leadership",desc:"Established a FinOps practice across AWS, GCP, and Azure, implementing tagging standards, budget alerting, and quarterly cost reviews that recovered $1.2M in annual cloud waste."},
-      {title:"Golden Path CI Templates",cat:"Automation",desc:"Authored a library of opinionated GitHub Actions workflow templates covering build, test, security scan, and deploy stages — adopted by 90% of product teams within one quarter."},
-      {title:"SRE Charter & SLO Framework",cat:"Leadership",desc:"Defined the org-wide SRE charter, error budget policy, and SLO tooling stack using Prometheus and Sloth, shifting incident culture from reactive firefighting to proactive reliability."},
-      {title:"Platform Reliability Review",cat:"Leadership",desc:"Introduced quarterly Production Readiness Reviews for all new services, catching 34 reliability gaps before launch across 12 teams in the first year of the programme."},
-      {title:"Secrets Management Overhaul",cat:"Infrastructure",desc:"Replaced a scattered mix of .env files and SSM parameters with a centralised HashiCorp Vault cluster, enforcing dynamic secrets and lease rotation for all 200+ production services."},
-      {title:"Ephemeral Preview Environments",cat:"Automation",desc:"Built a system to spin up full-stack preview environments per pull request using ArgoCD and DNS automation, eliminating shared staging contention and speeding QA cycles by 3×."},
-    ],
-    job1:[
-      {title:"Kubernetes Platform Migration",cat:"Infrastructure",desc:"Led the 18-month migration of a 60-service Ruby monolith to microservices on EKS, establishing namespace conventions, RBAC policies, and network policies adopted across all teams."},
-      {title:"CI/CD Platform Rebuild",cat:"Automation",desc:"Replaced a fragile Jenkins installation with a GitOps-driven pipeline platform on GitHub Actions and ArgoCD, reducing average deployment time from 45 minutes to under 8 minutes."},
-      {title:"Incident Runbook Library",cat:"Leadership",desc:"Partnered with SREs to document 80+ incident runbooks in Confluence, linked directly from PagerDuty alerts, cutting mean time to resolution by 40% within two quarters."},
-      {title:"Observability Stack Rollout",cat:"Infrastructure",desc:"Deployed a centralised observability platform using Prometheus, Grafana, and Loki across all production services, enabling engineers to self-serve dashboards and alert on SLOs."},
-      {title:"Zero-Downtime Deploy Framework",cat:"Automation",desc:"Engineered a blue-green deployment framework for stateful services, eliminating maintenance windows and enabling the business to deploy 12+ times per day with full rollback capability."},
-      {title:"On-Call Programme Redesign",cat:"Leadership",desc:"Restructured the on-call rotation across 5 squads, introduced severity tiers, and ran blameless postmortem training — reducing alert fatigue and improving engineer satisfaction scores."},
-    ],
-    job2:[
-      {title:"AWS Landing Zone",cat:"Infrastructure",desc:"Designed and deployed a multi-account AWS Landing Zone using Control Tower and Terraform, providing guardrails, centralised logging, and account vending for all product teams."},
-      {title:"Terraform Module Library",cat:"Automation",desc:"Built a company-wide Terraform module registry covering VPCs, RDS, ECS, and ALBs, reducing infrastructure definition boilerplate by 70% and enforcing tagging and security defaults."},
-      {title:"CI Pipeline Standardisation",cat:"Automation",desc:"Standardised all 40-engineer CI pipelines onto GitLab CI with shared templates, cutting pipeline configuration drift and reducing average build times from 22 to 9 minutes."},
-      {title:"Docker Migration",cat:"Infrastructure",desc:"Containerised 14 legacy Python and Node services using Docker and Docker Compose, paving the way for ECS adoption and eliminating environment-specific deployment failures."},
-      {title:"On-Call Alerting Cleanup",cat:"Leadership",desc:"Audited 500+ CloudWatch alarms, eliminating 60% as noisy or redundant, and rewrote the remainder with actionable runbook links, reducing on-call pages per week by half."},
-      {title:"Secrets Rotation Automation",cat:"Automation",desc:"Automated RDS and API key rotation using AWS Secrets Manager and Lambda, removing all hardcoded credentials from application config and achieving SOC 2 compliance."},
-    ],
-    job3:[
-      {title:"Containerisation Initiative",cat:"Infrastructure",desc:"Containerised a 12-service PHP monolith using Docker, introducing a local dev environment matching production and eliminating 'works on my machine' failures."},
-      {title:"Jenkins to GitLab CI",cat:"Automation",desc:"Migrated all build and deploy jobs from a fragile Jenkins server to GitLab CI pipelines, cutting pipeline maintenance overhead by 80%."},
-      {title:"Ansible Server Provisioning",cat:"Automation",desc:"Replaced manual server setup runbooks with Ansible playbooks, reducing provisioning time from 4 hours to under 10 minutes."},
-      {title:"Deployment Runbook Automation",cat:"Automation",desc:"Converted a 40-step manual deployment runbook into a single shell script, cutting deployment time from 2 hours to 12 minutes."},
-      {title:"Log Aggregation Setup",cat:"Infrastructure",desc:"Deployed a centralised ELK stack for log aggregation across all services, giving developers and support staff searchable, real-time access to production logs."},
-      {title:"Staging Parity Project",cat:"Leadership",desc:"Led a cross-team effort to bring staging infrastructure to parity with production, reducing environment-specific bugs reaching production by 65%."},
-    ],
-    job4:[
-      {title:"Internal Deploy Tool",cat:"Development",desc:"Built a Python CLI tool that wrapped Fabric and AWS CLI to standardise deployments across 8 services, eliminating ad-hoc SSH sessions."},
-      {title:"Jenkins Pipeline Library",cat:"Automation",desc:"Authored a Jenkins shared library in Groovy covering build, test, and deploy stages, reducing per-project pipeline configuration from 200 lines to under 20."},
-      {title:"Monitoring Dashboard",cat:"Development",desc:"Built a Flask web app pulling from Datadog and PagerDuty APIs to display live service health, on-call schedule, and recent incidents."},
-      {title:"Database Migration Framework",cat:"Development",desc:"Designed a lightweight Python migration framework for PostgreSQL schemas, adding rollback support and migration history tracking."},
-      {title:"AWS Cost Alerting",cat:"Automation",desc:"Wrote Lambda functions to monitor AWS spending per service tag and post weekly cost digests to Slack — the team's first per-service cloud spend visibility."},
-      {title:"Onboarding Automation",cat:"Automation",desc:"Built a Python script to automate new-engineer setup — GitHub access, AWS IAM roles, Slack channels, and local dev bootstrapping — reducing onboarding from a day to under an hour."},
-    ],
-    job5:[
-      {title:"Rails Performance Overhaul",cat:"Development",desc:"Profiled and optimised a slow Rails billing module, reducing average response time from 1,800 ms to 210 ms for the highest-traffic endpoint."},
-      {title:"API Rate Limiting",cat:"Development",desc:"Implemented token-bucket rate limiting on the public REST API using Redis, protecting backend services and reducing downstream database load by 35%."},
-      {title:"Automated QA Pipeline",cat:"Automation",desc:"Built a CircleCI pipeline running RSpec and Capybara suites on every pull request, eliminating manual QA regression cycles."},
-      {title:"Heroku to EC2 Migration",cat:"Infrastructure",desc:"Planned and executed the migration of all production services from Heroku to EC2 with Nginx and Puma, reducing monthly infrastructure cost by 60%."},
-      {title:"Feature Flag System",cat:"Development",desc:"Built a lightweight feature flag service backed by Redis, enabling percentage-cohort rollouts without deployments."},
-      {title:"Deployment Bash Toolkit",cat:"Automation",desc:"Wrote Bash scripts to automate zero-downtime Capistrano deployments, database backups, and rollbacks."},
-    ],
-    job6:[
-      {title:"Linux Patch Automation",cat:"Automation",desc:"Wrote Bash and cron-based automation to patch 80+ Linux servers for 12 clients, reducing manual effort by 90% and eliminating missed patch windows."},
-      {title:"Backup & Recovery Overhaul",cat:"Infrastructure",desc:"Replaced ad-hoc rsync scripts with a centralised Bacula backup solution, with weekly restore tests documented in a recovery runbook."},
-      {title:"Nagios Monitoring Rollout",cat:"Infrastructure",desc:"Deployed Nagios Core across the client fleet with custom checks for disk, CPU, memory, and service health, eliminating surprise outages."},
-      {title:"Active Directory Standardisation",cat:"Infrastructure",desc:"Standardised Group Policy and OU structure across 6 client Active Directory environments, enforcing consistent security baselines."},
-      {title:"Helpdesk Ticketing System",cat:"Leadership",desc:"Implemented osTicket for the 5-person team, cutting average response time from 6 hours to 90 minutes within the first month."},
-      {title:"Network Documentation Sprint",cat:"Leadership",desc:"Led a two-week effort to document network topology, firewall rules, and server inventory for all 12 clients using draw.io and Confluence."},
-      {title:"VPN Rollout for Remote Staff",cat:"Infrastructure",desc:"Deployed OpenVPN servers for 4 clients with split-tunnel config and certificate-based auth, enabling secure remote access for 60+ staff."},
-    ],
+/* ── Parse resume data from embedded YAML ── */
+(function(){
+  try {
+    const raw    = document.getElementById('resume-data').textContent;
+    const parsed = jsyaml.load(raw);
+    const c      = parsed.candidate || {};
+    window.D = {
+      candidate:  {
+        name:        c.name        || '',
+        description: c.description || '',
+        email:       c.email       || '',
+        linkedin:    c.linkedin    || '',
+        github:      c.github      || '',
+        headshot:    c.headshot    !== false,
+      },
+      showDemos:  parsed.show_demos !== false,
+      experience: parsed.experience || [],
+      projects:   parsed.projects   || {},
+    };
+  } catch(err) {
+    document.body.innerHTML = '<div style="font-family:monospace;padding:32px;color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;margin:32px">'
+      + '<strong>Failed to parse resume YAML:</strong><br>' + err.message
+      + '<br><br><small>Check the &lt;script type="text/yaml"&gt; block for syntax errors.</small></div>';
+    throw err;
   }
-};
+})();
 
 /* ── STATE ── */
 let cur = 0, activeFilt = 'All';
@@ -334,10 +495,22 @@ const iGh   = `<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 2
 /* ── SIDEBAR ── */
 function buildSidebar(){
   const c = D.candidate;
-  const initials = c.name.split(' ').map(w=>w[0]).slice(0,2).join('');
-  document.getElementById('sb-avatar').textContent = initials;
-  document.getElementById('sb-name').textContent = c.name;
-  document.getElementById('sb-role').textContent = c.description;
+  const avatarEl = document.getElementById('sb-avatar');
+  if (c.headshot) {
+    const exts = ['jpg', 'jpeg', 'png', 'webp'];
+    let found = false;
+    exts.forEach(ext => {
+      if (found) return;
+      const img = new Image();
+      img.onload = () => {
+        if (!found) { found = true; avatarEl.innerHTML = ''; avatarEl.appendChild(img); }
+      };
+      img.src = `headshot.${ext}`;
+      img.alt = c.name;
+    });
+  } else {
+    avatarEl.style.display = 'none';
+  }
   const links = document.getElementById('sb-links');
   if(c.email)    links.innerHTML += `<a href="mailto:${c.email}" class="sb-link">${iMail}${c.email}</a>`;
   if(c.linkedin) links.innerHTML += `<a href="${c.linkedin}" target="_blank" rel="noopener" class="sb-link">${iLi} LinkedIn</a>`;
@@ -440,6 +613,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 /* ── THEME TOGGLE ── */
 const toggleBtn = document.getElementById('theme-toggle');
 let isDark = false;
+toggleBtn.textContent = '🌙';
 toggleBtn.addEventListener('click', () => {
   isDark = !isDark;
   document.body.classList.toggle('dark', isDark);
