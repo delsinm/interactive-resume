@@ -4,11 +4,39 @@ A single-file, self-contained interactive résumé built with React and YAML. No
 
 ---
 
+## Features
+
+![light-mode_thumb](./images/light-mode_thumb-2.png) ![dark-mode_thumb](./images/dark-mode_thumb-2.png)
+
+### Experience Carousel
+
+Jobs are displayed one at a time in a card carousel. Navigate with the arrow buttons or the numbered dot indicators. Each card has a unique background style — the palette cycles automatically, so adding or removing jobs never requires any CSS changes.
+
+### Featured Projects
+
+Below the carousel, project cards for the currently selected job are shown in a grid. Hover over a card to see a highlight effect; click to open a popup with the full description. Close the popup with the **✕** button, by clicking the dimmed backdrop, or by pressing **Escape**.
+
+### Project Filtering
+
+Filter buttons above the grid let you narrow cards by category. The **All** button always appears first; the rest are derived from the `cat` values in the active job's projects. The filter resets to **All** automatically when you navigate to a different job.
+
+### Demos Page
+
+Page for listing technical demos. Demos are displayed in a list and are clickable links.
+
+### Dark Mode
+
+A moon/sun toggle button in the top-right corner switches between light and dark themes. (default theme can be specified in code)
+
+---
+
 ## Quick Start
 
 1. Copy `index.html` to any folder.
-2. Open it in a browser.
-3. Edit the YAML block inside the file to add your own content (see below).
+2. Edit the YAML block inside the file to add your own content (see below).
+3. Copy `headshot.jpg` or `headshot.png` to same folder as `index.html` (optional)
+4. Copy `demos.html` to the same folder as `index.html` (optional)
+5. Edit the JSON block inside the demos file to add your own demos. (see below) (optional)
 
 That's it. There are no dependencies to install and no build step.
 
@@ -103,7 +131,22 @@ Controls whether the **Demos!** bookmark ribbon appears in the top-right corner 
 
 ---
 
-### 4. `project_categories` — Filter Button Order *(optional)*
+### 4. `default_theme` — Default Color Scheme
+
+```yaml
+default_theme: light  # start in light mode (default if omitted)
+default_theme: dark   # start in dark mode
+```
+
+Sets the color scheme the page loads in. Accepts `"light"` or `"dark"`. If the key is omitted entirely, the page defaults to light mode.
+
+Visitors can always toggle between light and dark using the button in the top-right corner of the page. When they navigate between `index.html` and `demos.html`, the active theme is passed along automatically via a URL parameter (`?theme=dark` or `?theme=light`), so the color scheme stays consistent across both pages.
+
+> **Note:** If a visitor arrives at `index.html` via the return link from `demos.html`, the URL parameter takes priority over `default_theme`. This ensures the theme they were using on the demos page is preserved when they come back.
+
+---
+
+### 5. `project_categories` — Filter Button Order *(optional)*
 
 ```yaml
 project_categories:
@@ -119,7 +162,7 @@ Either way, you never need to update this list when adding a new category — ju
 
 ---
 
-### 5. `projects` — Featured Project Cards
+### 6. `projects` — Featured Project Cards
 
 ```yaml
 projects:
@@ -156,26 +199,6 @@ The special key `demos` maps to the **Demos!** ribbon card:
       cat: "Automation"
       desc: "A live demo of the internal developer platform health dashboard..."
 ```
-
----
-
-## Features
-
-### Experience Carousel
-
-Jobs are displayed one at a time in a card carousel. Navigate with the arrow buttons or the numbered dot indicators. Each card has a unique background style — the palette cycles automatically, so adding or removing jobs never requires any CSS changes.
-
-### Featured Projects
-
-Below the carousel, project cards for the currently selected job are shown in a grid. Hover over a card to see a highlight effect; click to open a popup with the full description. Close the popup with the **✕** button, by clicking the dimmed backdrop, or by pressing **Escape**.
-
-### Project Filtering
-
-Filter buttons above the grid let you narrow cards by category. The **All** button always appears first; the rest are derived from the `cat` values in the active job's projects. The filter resets to **All** automatically when you navigate to a different job.
-
-### Dark Mode
-
-A moon/sun toggle button in the top-right corner switches between light and dark themes.
 
 ---
 
@@ -232,30 +255,6 @@ const demoData = [
 **Reordering demos:** move the objects within the array — cards render in list order.
 
 **Disabling a link:** set `link: ""` to make the card non-clickable without removing it.
-
----
-
-## Themes
-
-Three different themes are included for your use.
-
-### **paper-resume**
-
-![paper-resume_thumb](./paper-resume/paper-resume_thumb.png)
-
-The paper-resume theme takes its cues from a traditional printed résumé, prioritising clean typography and a document-like layout. The candidate's name and headline sit prominently at the top, followed by the experience carousel as the dominant element on the page. The colour palette is warm and neutral — off-whites and soft greys — evoking the feel of quality paper stock. Navigation is minimal and unobtrusive, keeping the focus on content. This theme is for roles in more formal or traditional industries where a classic, professional aesthetic carries weight.
-
-### **light-mode**
-
-![light-mode_thumb](./light-mode/light-mode_thumb.png)
-
-The light-mode theme is a contemporary, app-style layout built around a fixed sidebar that houses the candidate's name, contact links, and job navigation. The main content area sits to the right, giving the experience carousel and project grid plenty of breathing room. The palette leans into warm whites and subtle borders with gold accents, creating a polished look that feels at home alongside a modern portfolio or SaaS product. A moon icon in the top-right corner lets visitors switch to dark mode at any time, making this theme a versatile default for most audiences. To use the headshot feature, set `headshot: true` in the candidate yaml and upload `headshot.png` or `headshot.jpg` to the same folder as index.html.
-
-### **dark-mode**
-
-![dark-mode_thumb](./dark-mode/dark-mode_thumb.png)
-
-The dark-mode theme is structurally identical to light-mode — same sidebar layout, same gold accents, same navigation behaviour — but loads with a deep, near-black background and adjusted contrast levels that reduce eye strain in low-light environments. The gold highlights glow more vividly against the dark surfaces, giving the page a slightly more dramatic, editorial quality. A sun icon in the top-right corner lets visitors switch to light mode at any time. This theme is a strong choice for technical roles in software, DevOps, and design, where dark interfaces are a familiar and expected aesthetic. To use the headshot feature, set `headshot: true` in the candidate yaml and upload `headshot.png` or `headshot.jpg` to the same folder as index.html.
 
 ---
 
