@@ -52,7 +52,7 @@ Because everything is self-contained in one file, you can host it anywhere that 
 
 ## Editing the YAML
 
-Open `index.html` in any text editor and jump to **line 431** — you'll find the `<script type="text/yaml" id="resume-data">` block. Everything inside it controls what appears on the page.
+Open `index.html` in any text editor and jump to **line 269** — you'll find the `<script type="text/yaml" id="resume-data">` block. Everything inside it controls what appears on the page.
 
 The block has five sections, described below.
 
