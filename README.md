@@ -1,6 +1,6 @@
 # Interactive Resume — User Guide
 
-A single-file, self-contained interactive résumé built with React and YAML. No build tools, no server required — open `index.html` in any browser and it works.
+A single-file, self-contained interactive résumé built with JS and YAML. No build tools, no server required — open `index.html` in any browser and it works.
 
 ---
 
