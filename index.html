@@ -35,13 +35,12 @@
          show_demos: false   — button is hidden
        NOTE: The button links to demos.html. That file must exist in the same
        folder as index.html for the link to work.
-    
+
     4. headshot
-       Controls whether the professional headshot is displayed.
-         headshot: true    — headshot is visible
+       Controls whether the professional headshot appears in the sidebar.
+         headshot: true    — headshot is visible (default)
          headshot: false   — headshot is hidden
-       NOTE: The headshot links to headshot.jpg or headshot.png That file must 
-       exist in the same folder as index.html for the image to be visible.
+       NOTE: The headshot image must exist in the same folder as index.html for it to be displayed.
 
     5. experience
        A list of jobs shown in the carousel. Each entry has:
@@ -505,6 +504,22 @@ projects:
 /* ── STATE ── */
 let cur = 0, activeFilt = 'All';
 
+/* ── SECURITY HELPERS ── */
+// Escapes a value for safe insertion into innerHTML
+function esc(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+// Allows only safe URL schemes; returns '' for anything else (e.g. javascript:)
+function safeUrl(url) {
+  const s = String(url ?? '').trim();
+  return /^(https?:\/\/|mailto:)/i.test(s) ? s : '';
+}
+
 /* ── ICONS ── */
 const iMail = `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`;
 const iLi   = `<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>`;
@@ -530,14 +545,21 @@ function buildSidebar(){
     avatarEl.style.display = 'none';
   }
   const links = document.getElementById('sb-links');
-  if(c.email)    links.innerHTML += `<a href="mailto:${c.email}" class="sb-link">${iMail}${c.email}</a>`;
-  if(c.linkedin) links.innerHTML += `<a href="${c.linkedin}" target="_blank" rel="noopener" class="sb-link">${iLi} LinkedIn</a>`;
-  if(c.github)   links.innerHTML += `<a href="${c.github}" target="_blank" rel="noopener" class="sb-link">${iGh} GitHub</a>`;
+  if(c.email)    links.innerHTML += `<a href="${esc(safeUrl('mailto:'+c.email))}" class="sb-link">${iMail}${esc(c.email)}</a>`;
+  if(c.linkedin) links.innerHTML += `<a href="${esc(safeUrl(c.linkedin))}" target="_blank" rel="noopener" class="sb-link">${iLi} LinkedIn</a>`;
+  if(c.github)   links.innerHTML += `<a href="${esc(safeUrl(c.github))}" target="_blank" rel="noopener" class="sb-link">${iGh} GitHub</a>`;
   const nav = document.getElementById('sb-nav-items');
   D.experience.forEach((exp,i)=>{
     const el = document.createElement('div');
     el.className = 'nav-item'+(i===0?' active':'');
-    el.innerHTML = `<span class="nav-dot"></span><span><span class="nav-job-title">${exp.title}</span><br><span class="nav-company">${exp.company}</span></span>`;
+    // Build nav item with DOM API to avoid innerHTML injection
+    const dot = document.createElement('span'); dot.className = 'nav-dot';
+    const wrap = document.createElement('span');
+    const titleEl = document.createElement('span'); titleEl.className = 'nav-job-title'; titleEl.textContent = exp.title;
+    const br = document.createElement('br');
+    const compEl = document.createElement('span'); compEl.className = 'nav-company'; compEl.textContent = exp.company;
+    wrap.appendChild(titleEl); wrap.appendChild(br); wrap.appendChild(compEl);
+    el.appendChild(dot); el.appendChild(wrap);
     el.addEventListener('click',()=>goTo(i));
     nav.appendChild(el);
   });
@@ -606,7 +628,7 @@ function renderGrid(projects){
   grid.innerHTML='';
   filtered.forEach(p=>{
     const card=document.createElement('div'); card.className='proj-card';
-    card.innerHTML=`<div class="proj-cat">${p.cat}</div><div class="proj-name">${p.title}</div><span class="proj-arrow">→</span>`;
+    card.innerHTML=`<div class="proj-cat">${esc(p.cat)}</div><div class="proj-name">${esc(p.title)}</div><span class="proj-arrow">→</span>`;
     card.addEventListener('click',()=>openModal(p));
     grid.appendChild(card);
   });
