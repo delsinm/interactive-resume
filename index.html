@@ -103,31 +103,40 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .sb-top::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent)}
 .avatar{width:160px;height:160px;border-radius:50%;margin-bottom:14px;box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--gold);overflow:hidden;flex-shrink:0}
 .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+/* avatar states — toggled with CSS classes instead of inline styles */
+.avatar.hidden{display:none}
+.avatar.placeholder{display:flex;align-items:center;justify-content:center;text-align:center;padding:12px}
+.avatar-hint{font-size:.65rem;line-height:1.4;color:var(--t3)}
 .sb-name{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.07em;line-height:1.1}
 .sb-role{font-size:.68rem;font-weight:500;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;margin-top:4px}
 .sb-links{display:flex;flex-direction:column;gap:5px;margin-top:18px}
 .sb-link{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:4px;font-size:.72rem;color:var(--t2);text-decoration:none;border:1px solid transparent;transition:all .2s}
 .sb-link:hover{color:var(--gold);background:var(--gold-dim);border-color:rgba(201,168,76,.2)}
-.sb-link svg{flex-shrink:0;opacity:.55}
+.sb-link svg{flex-shrink:0;opacity:.55;aria-hidden:true}
 .sb-link:hover svg{opacity:1}
 .sb-nav{flex:1;padding:22px 0}
 .nav-lbl{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--t3);padding:0 28px;margin-bottom:6px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 28px;font-size:.78rem;font-weight:500;color:var(--t2);cursor:pointer;transition:all .2s;position:relative}
+/* nav-item is now a <button> — reset default button styles */
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 28px;width:100%;font-size:.78rem;font-family:'DM Sans',sans-serif;font-weight:500;color:var(--t2);background:transparent;border:none;cursor:pointer;transition:all .2s;position:relative;text-align:left}
 .nav-item::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:2px;height:0;background:var(--gold);transition:height .2s;border-radius:0 2px 2px 0}
 .nav-item:hover{color:var(--t1)}
 .nav-item:hover::before{height:55%}
 .nav-item.active{color:var(--gold)}
 .nav-item.active::before{height:65%}
+.nav-item:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 .nav-dot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:.5}
 .nav-item.active .nav-dot{opacity:1}
 .nav-job-title{display:block;font-size:.78rem;font-weight:500;line-height:1.1}
 .nav-company{display:block;font-size:.68rem;font-weight:400;color:var(--t3);line-height:1.1}
-.sb-bottom{padding:18px 28px;border-top:1px solid var(--border)}
+.sb-bottom{padding:18px 28px;border-top:1px solid var(--border);margin-top:24px}
+/* sb-bottom visibility controlled by HTML hidden attribute, not inline style */
 .theme-toggle{position:fixed;top:16px;right:20px;z-index:200;width:36px;height:36px;border-radius:50%;background:var(--card);border:1px solid var(--border2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .theme-toggle:hover{border-color:var(--gold);color:var(--gold);box-shadow:0 0 12px var(--gold-glow)}
+.theme-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 body.dark{--bg:#0d0d0f;--surface:#131316;--card:#18181d;--card2:#1e1e25;--border:#28282f;--border2:#33333c;--t1:#f0eeea;--t2:#95949e;--t3:#52515a;--gold:#c9a84c;--gold-dim:rgba(201,168,76,.13);--gold-glow:rgba(201,168,76,.22)}
 .demos-pill{display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 14px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.28);border-radius:6px;font-size:.72rem;font-weight:600;color:var(--gold);text-decoration:none;text-transform:uppercase;letter-spacing:.1em;transition:all .2s}
 .demos-pill:hover{background:var(--gold-dim);border-color:var(--gold);box-shadow:0 0 18px var(--gold-glow)}
+.demos-pill:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 @keyframes shake{0%,100%{transform:translateX(0)}10%{transform:translateX(-4px) rotate(-1deg)}20%{transform:translateX(4px) rotate(1deg)}30%{transform:translateX(-4px) rotate(-1deg)}40%{transform:translateX(4px) rotate(1deg)}50%{transform:translateX(-2px)}60%{transform:translateX(2px)}70%,90%{transform:translateX(0)}}
 .demos-pill.shaking{animation:shake .6s ease}
 /* MAIN */
@@ -163,21 +172,25 @@ body.dark{--bg:#0d0d0f;--surface:#131316;--card:#18181d;--card2:#1e1e25;--border
 .c-controls{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
 .c-arrow{width:36px;height:36px;border-radius:2px;background:var(--card);border:1px solid var(--border);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .c-arrow:hover{border-color:var(--gold);color:var(--gold);box-shadow:0 0 10px var(--gold-glow)}
+.c-arrow:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .c-dots{display:flex;gap:5px}
 .c-dot{width:22px;height:22px;border-radius:2px;font-size:.63rem;font-family:'DM Mono',monospace;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--t3);display:flex;align-items:center;justify-content:center;transition:all .2s}
 .c-dot.on{background:var(--gold);color:#0d0d0f;border-color:var(--gold)}
 .c-dot:hover:not(.on){border-color:var(--gold);color:var(--gold)}
+.c-dot:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* PROJECTS */
 .proj-wrap{margin-bottom:40px}
 .filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
 .f-btn{padding:4px 13px;border-radius:2px;border:1px solid var(--border);background:transparent;color:var(--t3);font-size:.7rem;font-weight:600;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;transition:all .2s}
 .f-btn:hover{border-color:var(--gold);color:var(--gold)}
 .f-btn.on{background:var(--gold);color:#0d0d0f;border-color:var(--gold)}
+.f-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:11px}
 .proj-card{background:var(--card);border:1px solid var(--border);border-radius:2px;padding:18px 18px 14px;cursor:pointer;position:relative;min-height:90px;transition:all .2s;overflow:hidden}
 .proj-card::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s ease}
 .proj-card:hover{background:var(--card2);border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.4)}
 .proj-card:hover::after{width:100%}
+.proj-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .proj-cat{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);margin-bottom:7px}
 .proj-name{font-size:.85rem;font-weight:500;color:var(--t1);line-height:1.4}
 .proj-arrow{position:absolute;bottom:12px;right:14px;font-size:.72rem;color:var(--gold);opacity:0;transform:translateX(-4px);transition:all .2s}
@@ -194,10 +207,18 @@ body.dark{--bg:#0d0d0f;--surface:#131316;--card:#18181d;--card2:#1e1e25;--border
 .m-desc{font-size:.86rem;font-weight:300;color:var(--t2);line-height:1.8}
 .m-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:2px;border:1px solid var(--border);background:transparent;color:var(--t3);font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .m-close:hover{border-color:var(--red);color:var(--red)}
+.m-close:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* ANIM */
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .au{animation:fadeUp .5s ease both}
 .au1{animation-delay:.05s}.au2{animation-delay:.15s}.au3{animation-delay:.25s}
+/* Respect reduced-motion preference */
+@media(prefers-reduced-motion:reduce){
+  .au{animation:none}
+  .c-card,.prog-bar,.c-arrow,.c-dot,.f-btn,.proj-card,.proj-card::after,.proj-arrow,.sb-link,.demos-pill,.nav-item::before,.nav-item,.theme-toggle{transition:none}
+  .modal-bg.open,.modal-box{animation:none}
+  .demos-pill.shaking{animation:none}
+}
 /* MOBILE */
 @media(max-width:720px){
   .layout{flex-direction:column}
@@ -208,55 +229,94 @@ body.dark{--bg:#0d0d0f;--surface:#131316;--card:#18181d;--card2:#1e1e25;--border
 </style>
 </head>
 <body>
-<button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode">🌙</button>
+<button class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode">🌙</button>
 <div class="layout">
-  <aside class="sidebar">
+  <aside class="sidebar" aria-label="Navigation sidebar">
     <div class="sb-top">
-      <div class="avatar" id="sb-avatar"></div>
-      <div class="sb-links" id="sb-links"></div>
-      <div id="sb-bottom" style="display:none;margin-top:10px">
+      <!-- avatar visibility set via CSS class in JS, not inline style -->
+      <div class="avatar" id="sb-avatar" role="img" aria-label="Profile photo"></div>
+      <div class="sb-links" id="sb-links" aria-label="Contact links"></div>
+      <!-- hidden attribute used instead of style="display:none" -->
+      <div id="sb-bottom" hidden>
         <a href="demos.html" class="demos-pill">✦ View Demos</a>
       </div>
     </div>
-    <nav class="sb-nav">
-      <div class="nav-lbl">Experience</div>
-      <div id="sb-nav-items"></div>
+    <nav class="sb-nav" aria-label="Experience navigation">
+      <div class="nav-lbl" aria-hidden="true">Experience</div>
+      <!-- role="list" restores list semantics when CSS list-style is removed -->
+      <div id="sb-nav-items" role="list"></div>
     </nav>
   </aside>
   <main class="main">
     <div class="hero au au1">
       <div class="hero-wrap">
-        <div class="hero-ghost" id="hero-ghost"></div>
+        <!-- decorative shadow duplicate — hidden from assistive tech -->
+        <div class="hero-ghost" id="hero-ghost" aria-hidden="true"></div>
         <h1 class="hero-name" id="hero-name"></h1>
       </div>
-      <p class="hero-desc"><span class="hero-line"></span><span id="hero-desc"></span></p>
+      <p class="hero-desc">
+        <span class="hero-line" aria-hidden="true"></span>
+        <span id="hero-desc"></span>
+      </p>
     </div>
     <div class="carousel-wrap au au2">
-      <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title">Experience</h2><div class="sec-rule"></div></div>
-      <div class="c-card" id="c-card">
-        <div class="c-counter" id="c-counter"></div>
-        <div class="prog-bars" id="prog-bars"></div>
+      <div class="sec-head">
+        <span class="sec-num" aria-hidden="true">01</span>
+        <h2 class="sec-title">Experience</h2>
+        <div class="sec-rule" aria-hidden="true"></div>
+      </div>
+      <!--
+        aria-live="polite" announces carousel content changes to screen readers.
+        aria-atomic="true" ensures the whole region is announced, not just the changed node.
+        aria-label is updated by JS to reflect the current position.
+      -->
+      <div class="c-card" id="c-card" aria-live="polite" aria-atomic="true" aria-label="Experience 1">
+        <!-- decorative large counter numeral — hidden from AT -->
+        <div class="c-counter" id="c-counter" aria-hidden="true"></div>
+        <!-- progress bars are decorative; position is conveyed by aria-label on the card -->
+        <div class="prog-bars" id="prog-bars" aria-hidden="true"></div>
         <div class="badge" id="c-period"></div>
         <div class="c-title" id="c-title"></div>
         <div class="c-company" id="c-company"></div>
         <p class="c-desc" id="c-desc"></p>
       </div>
-      <div class="c-controls">
-        <button class="c-arrow" id="prev-btn"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <div class="c-dots" id="c-dots"></div>
-        <button class="c-arrow" id="next-btn"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="c-controls" role="group" aria-label="Carousel navigation">
+        <button class="c-arrow" id="prev-btn" aria-label="Previous experience">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+            <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <!-- c-dots built by JS with aria-labels per dot -->
+        <div class="c-dots" id="c-dots" role="group" aria-label="Go to experience"></div>
+        <button class="c-arrow" id="next-btn" aria-label="Next experience">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+            <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
     </div>
     <div class="proj-wrap au au3">
-      <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title">Featured Projects</h2><div class="sec-rule"></div></div>
-      <div class="filter-bar" id="filter-bar"></div>
-      <div class="proj-grid" id="proj-grid"></div>
+      <div class="sec-head">
+        <span class="sec-num" aria-hidden="true">02</span>
+        <h2 class="sec-title">Featured Projects</h2>
+        <div class="sec-rule" aria-hidden="true"></div>
+      </div>
+      <!-- filter-bar labelled as a group of filter controls -->
+      <div class="filter-bar" id="filter-bar" role="group" aria-label="Filter projects by category"></div>
+      <div class="proj-grid" id="proj-grid" aria-label="Project cards"></div>
     </div>
   </main>
 </div>
-<div class="modal-bg" id="modal">
+
+<!--
+  role="dialog" identifies this as a modal dialog for AT.
+  aria-modal="true" tells screen readers to restrict focus to the dialog.
+  aria-labelledby points at the visible title inside the box.
+  display:none / flex controlled via .open class — no inline style needed.
+-->
+<div class="modal-bg" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title" hidden>
   <div class="modal-box">
-    <button class="m-close" id="modal-close">✕</button>
+    <button class="m-close" id="modal-close" aria-label="Close project detail">✕</button>
     <div class="m-cat" id="m-cat"></div>
     <div class="m-title" id="m-title"></div>
     <p class="m-desc" id="m-desc"></p>
@@ -479,216 +539,444 @@ projects:
 </script>
 
 <script>
-/* ── Parse resume data from embedded YAML ── */
-(function(){
-  try {
-    const raw    = document.getElementById('resume-data').textContent;
-    const parsed = jsyaml.load(raw);
-    const c      = parsed.candidate || {};
-    window.D = {
-      candidate:  {
-        name:        c.name        || '',
-        description: c.description || '',
-        email:       c.email       || '',
-        linkedin:    c.linkedin    || '',
-        github:      c.github      || '',
-        blog:        c.blog        || '',
-      },
-      defaultTheme:  parsed.default_theme  === 'dark' ? 'dark' : 'light',
-      showDemos:     parsed.show_demos     !== false,
-      showHeadshot:  parsed.show_headshot  !== false,
-      experience: parsed.experience || [],
-      projects:   parsed.projects   || {},
-    };
-  } catch(err) {
-    document.body.innerHTML = '<div style="font-family:monospace;padding:32px;color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;margin:32px">'
-      + '<strong>Failed to parse resume YAML:</strong><br>' + err.message
-      + '<br><br><small>Check the &lt;script type="text/yaml"&gt; block for syntax errors.</small></div>';
-    throw err;
-  }
-})();
-
-/* ── STATE ── */
-let cur = 0, activeFilt = 'All';
+(function () {
+'use strict';
 
 /* ── SECURITY HELPERS ── */
-// Escapes a value for safe insertion into innerHTML
-function esc(str) {
-  return String(str ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-// Allows only safe URL schemes; returns '' for anything else (e.g. javascript:)
+
+// Allows only safe URL schemes — blocks javascript:, data:, vbscript:, etc.
 function safeUrl(url) {
   const s = String(url ?? '').trim();
   return /^(https?:\/\/|mailto:)/i.test(s) ? s : '';
 }
 
-/* ── ICONS ── */
-const iMail = `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`;
-const iLi   = `<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>`;
-const iGh   = `<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>`;
-const iBlog = `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
+/* ── PARSE RESUME DATA ── */
+
+// All data is scoped inside the IIFE — nothing written to window.
+let D;
+try {
+  const raw    = document.getElementById('resume-data').textContent;
+  const parsed = jsyaml.load(raw);
+  const c      = parsed.candidate ?? {};
+  D = {
+    candidate: {
+      name:        String(c.name        ?? ''),
+      description: String(c.description ?? ''),
+      email:       String(c.email       ?? ''),
+      linkedin:    String(c.linkedin    ?? ''),
+      github:      String(c.github      ?? ''),
+      blog:        String(c.blog        ?? ''),
+    },
+    defaultTheme: parsed.default_theme === 'dark' ? 'dark' : 'light',
+    showDemos:    parsed.show_demos    !== false,
+    showHeadshot: parsed.show_headshot !== false,
+    experience:   Array.isArray(parsed.experience) ? parsed.experience : [],
+    projects:     (parsed.projects && typeof parsed.projects === 'object') ? parsed.projects : {},
+  };
+} catch (err) {
+  // YAML parse failure — show a readable error without using innerHTML on user data.
+  // err.message comes from the JS YAML library, not from user-supplied YAML content,
+  // so it is safe to display. We still use DOM APIs to be consistent.
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'font-family:monospace;padding:32px;color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;margin:32px';
+  const heading = document.createElement('strong');
+  heading.textContent = 'Failed to parse resume YAML:';
+  const br1 = document.createElement('br');
+  const msg = document.createTextNode(err.message);
+  const br2 = document.createElement('br'); br2.appendChild(document.createElement('br'));
+  const hint = document.createElement('small');
+  hint.textContent = 'Check the <script type="text/yaml"> block for syntax errors.';
+  wrap.appendChild(heading);
+  wrap.appendChild(br1);
+  wrap.appendChild(msg);
+  wrap.appendChild(br2);
+  wrap.appendChild(hint);
+  document.body.replaceChildren(wrap);
+  throw err;
+}
+
+/* ── STATE — local to IIFE, never on window ── */
+let cur       = 0;
+let activeFilt = 'All';
+
+/* ── ICONS (static SVG strings used only in trusted DOM property assignments) ── */
+// These are hardcoded markup strings with no user data — safe to keep as strings
+// and assign via .innerHTML on freshly-created elements that hold no prior content.
+const ICONS = {
+  mail: '<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>',
+  li:   '<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>',
+  gh:   '<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>',
+  blog: '<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+};
+
+/* ── HELPERS ── */
+
+// Creates an <a> sidebar link entirely via DOM API — no innerHTML for user data.
+function makeSbLink(href, label, iconKey, extraAttrs) {
+  const a = document.createElement('a');
+  a.href      = href;
+  a.className = 'sb-link';
+  // Set the icon (static trusted markup) on a wrapper span, not on the anchor itself,
+  // to keep the user-supplied label strictly in textContent.
+  const iconSpan = document.createElement('span');
+  iconSpan.innerHTML = ICONS[iconKey]; // static SVG only — no user data
+  const labelNode = document.createTextNode(label);
+  a.appendChild(iconSpan);
+  a.appendChild(labelNode);
+  if (extraAttrs) {
+    Object.entries(extraAttrs).forEach(([k, v]) => a.setAttribute(k, v));
+  }
+  return a;
+}
 
 /* ── SIDEBAR ── */
-function buildSidebar(){
-  const c = D.candidate;
-  const avatarEl = document.getElementById('sb-avatar');
+function buildSidebar() {
+  const c         = D.candidate;
+  const avatarEl  = document.getElementById('sb-avatar');
+  const linksEl   = document.getElementById('sb-links');
+
+  // ── Headshot ──
   if (D.showHeadshot) {
     const exts = ['jpg', 'jpeg', 'png', 'webp'];
-    let found = false, failed = 0;
+    let found  = false;
+    let failed = 0;
     exts.forEach(ext => {
       if (found) return;
-      const img = new Image();
-      img.onload = () => {
-        if (!found) { found = true; avatarEl.innerHTML = ''; avatarEl.appendChild(img); }
+      const img    = new Image();
+      img.onload   = () => {
+        if (!found) {
+          found      = true;
+          img.alt    = String(c.name ?? ''); // safe: textContent equivalent for img
+          avatarEl.replaceChildren(img);     // DOM API — no innerHTML
+        }
       };
-      img.onerror = () => {
+      img.onerror  = () => {
         failed++;
         if (!found && failed === exts.length) {
-          avatarEl.style.display = 'flex';
-          avatarEl.style.alignItems = 'center';
-          avatarEl.style.justifyContent = 'center';
-          avatarEl.style.textAlign = 'center';
-          avatarEl.style.padding = '12px';
-          avatarEl.innerHTML = '<span style="font-size:.65rem;line-height:1.4;color:var(--t3)">Add <code>headshot.jpg</code> or <code>headshot.png</code> to this folder</span>';
+          // No headshot found — show a text hint using CSS class + DOM nodes
+          avatarEl.classList.add('placeholder');
+          const hint = document.createElement('span');
+          hint.className   = 'avatar-hint';
+          hint.textContent = 'Add headshot.jpg or headshot.png to this folder';
+          avatarEl.replaceChildren(hint);
         }
       };
       img.src = `headshot.${ext}`;
-      img.alt = c.name;
     });
   } else {
-    avatarEl.style.display = 'none';
+    avatarEl.classList.add('hidden'); // CSS class, not inline style
   }
-  const links = document.getElementById('sb-links');
-  if(c.email)    links.innerHTML += `<a href="${esc(safeUrl('mailto:'+c.email))}" class="sb-link">${iMail}${esc(c.email)}</a>`;
-  if(c.linkedin) links.innerHTML += `<a href="${esc(safeUrl(c.linkedin))}" target="_blank" rel="noopener" class="sb-link">${iLi} LinkedIn</a>`;
-  if(c.github)   links.innerHTML += `<a href="${esc(safeUrl(c.github))}" target="_blank" rel="noopener" class="sb-link">${iGh} GitHub</a>`;
-  if(c.blog)     links.innerHTML += `<a href="${esc(safeUrl(c.blog))}" target="_blank" rel="noopener" class="sb-link">${iBlog} Blog</a>`;
+
+  // ── Contact links — all built with DOM API, no innerHTML for user data ──
+  if (c.email) {
+    const url = safeUrl('mailto:' + c.email);
+    if (url) linksEl.appendChild(makeSbLink(url, c.email, 'mail'));
+  }
+  if (c.linkedin) {
+    const url = safeUrl(c.linkedin);
+    if (url) linksEl.appendChild(makeSbLink(url, 'LinkedIn', 'li', { target: '_blank', rel: 'noopener noreferrer' }));
+  }
+  if (c.github) {
+    const url = safeUrl(c.github);
+    if (url) linksEl.appendChild(makeSbLink(url, 'GitHub', 'gh', { target: '_blank', rel: 'noopener noreferrer' }));
+  }
+  if (c.blog) {
+    const url = safeUrl(c.blog);
+    if (url) linksEl.appendChild(makeSbLink(url, 'Blog', 'blog', { target: '_blank', rel: 'noopener noreferrer' }));
+  }
+
+  // ── Sidebar nav ──
   const nav = document.getElementById('sb-nav-items');
-  D.experience.forEach((exp,i)=>{
-    const el = document.createElement('div');
-    el.className = 'nav-item'+(i===0?' active':'');
-    // Build nav item with DOM API to avoid innerHTML injection
-    const dot = document.createElement('span'); dot.className = 'nav-dot';
-    const wrap = document.createElement('span');
-    const titleEl = document.createElement('span'); titleEl.className = 'nav-job-title'; titleEl.textContent = exp.title;
-    const br = document.createElement('br');
-    const compEl = document.createElement('span'); compEl.className = 'nav-company'; compEl.textContent = exp.company;
-    wrap.appendChild(titleEl); wrap.appendChild(br); wrap.appendChild(compEl);
-    el.appendChild(dot); el.appendChild(wrap);
-    el.addEventListener('click',()=>goTo(i));
-    nav.appendChild(el);
+  D.experience.forEach((exp, i) => {
+    // <button> instead of <div> — natively focusable and keyboard-activatable
+    const btn = document.createElement('button');
+    btn.className  = 'nav-item' + (i === 0 ? ' active' : '');
+    btn.setAttribute('role', 'listitem');
+    btn.setAttribute('aria-current', i === 0 ? 'true' : 'false');
+    btn.setAttribute('aria-label', String(exp.title ?? '') + ' at ' + String(exp.company ?? ''));
+
+    const dot     = document.createElement('span');
+    dot.className = 'nav-dot';
+    dot.setAttribute('aria-hidden', 'true');
+
+    const wrap    = document.createElement('span');
+
+    const titleEl       = document.createElement('span');
+    titleEl.className   = 'nav-job-title';
+    titleEl.textContent = String(exp.title ?? '');
+
+    const compEl        = document.createElement('span');
+    compEl.className    = 'nav-company';
+    compEl.textContent  = String(exp.company ?? '');
+
+    wrap.appendChild(titleEl);
+    wrap.appendChild(document.createElement('br'));
+    wrap.appendChild(compEl);
+
+    btn.appendChild(dot);
+    btn.appendChild(wrap);
+    btn.addEventListener('click', () => goTo(i));
+    nav.appendChild(btn);
   });
-  if(D.showDemos) document.getElementById('sb-bottom').style.display='';
+
+  // ── Demos button — use hidden attribute, not inline style ──
+  if (D.showDemos) {
+    document.getElementById('sb-bottom').removeAttribute('hidden');
+  }
 }
 
 /* ── HERO ── */
-function buildHero(){
+function buildHero() {
   const c = D.candidate;
-  document.getElementById('hero-ghost').textContent = c.name;
-  document.getElementById('hero-name').textContent  = c.name;
-  document.getElementById('hero-desc').textContent  = c.description;
-  document.title = c.name+' — Resume';
+  document.getElementById('hero-ghost').textContent = String(c.name ?? '');
+  document.getElementById('hero-name').textContent  = String(c.name ?? '');
+  document.getElementById('hero-desc').textContent  = String(c.description ?? '');
+  document.title = String(c.name ?? '') + ' — Resume';
 }
 
 /* ── CAROUSEL ── */
-const GLOWS=['rgba(201,168,76,.13)','rgba(78,205,196,.09)','rgba(139,92,246,.09)','rgba(59,130,246,.09)','rgba(5,150,105,.09)','rgba(244,63,94,.09)','rgba(234,88,12,.09)'];
+const GLOWS = [
+  'rgba(201,168,76,.13)', 'rgba(78,205,196,.09)', 'rgba(139,92,246,.09)',
+  'rgba(59,130,246,.09)', 'rgba(5,150,105,.09)',  'rgba(244,63,94,.09)',
+  'rgba(234,88,12,.09)',
+];
 
-function renderCarousel(){
-  const exp=D.experience[cur], total=D.experience.length;
-  document.getElementById('c-card').style.backgroundImage=`radial-gradient(ellipse 75% 75% at 95% 5%,${GLOWS[cur%GLOWS.length]} 0%,transparent 65%)`;
-  document.getElementById('c-counter').textContent=String(cur+1).padStart(2,'0');
-  document.getElementById('c-period').textContent=exp.period;
-  document.getElementById('c-title').textContent=exp.title;
-  document.getElementById('c-company').textContent=exp.company;
-  document.getElementById('c-desc').textContent=exp.description;
-  // progress bars
-  const pb=document.getElementById('prog-bars'); pb.innerHTML='';
-  for(let i=0;i<total;i++){const d=document.createElement('div');d.className='prog-bar'+(i===cur?' on':'');pb.appendChild(d);}
-  // dots
-  const dots=document.getElementById('c-dots'); dots.innerHTML='';
-  for(let i=0;i<total;i++){const b=document.createElement('button');b.className='c-dot'+(i===cur?' on':'');b.textContent=i+1;b.addEventListener('click',()=>goTo(i));dots.appendChild(b);}
-  // nav active
-  document.querySelectorAll('.nav-item').forEach((el,i)=>el.classList.toggle('active',i===cur));
+function renderCarousel() {
+  const exp   = D.experience[cur] ?? {};
+  const total = D.experience.length;
+
+  const card = document.getElementById('c-card');
+  card.style.backgroundImage = `radial-gradient(ellipse 75% 75% at 95% 5%,${GLOWS[cur % GLOWS.length]} 0%,transparent 65%)`;
+  // Update aria-label so AT knows which slide is showing
+  card.setAttribute('aria-label', `Experience ${cur + 1} of ${total}: ${String(exp.title ?? '')} at ${String(exp.company ?? '')}`);
+
+  document.getElementById('c-counter').textContent = String(cur + 1).padStart(2, '0');
+  document.getElementById('c-period').textContent  = String(exp.period      ?? '');
+  document.getElementById('c-title').textContent   = String(exp.title       ?? '');
+  document.getElementById('c-company').textContent = String(exp.company     ?? '');
+  document.getElementById('c-desc').textContent    = String(exp.description ?? '');
+
+  // ── Progress bars (decorative) ──
+  const pb = document.getElementById('prog-bars');
+  pb.replaceChildren(); // clear without innerHTML=''
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'prog-bar' + (i === cur ? ' on' : '');
+    pb.appendChild(d);
+  }
+
+  // ── Dot buttons — each gets an aria-label describing its destination ──
+  const dotsEl = document.getElementById('c-dots');
+  dotsEl.replaceChildren();
+  for (let i = 0; i < total; i++) {
+    const exp_i = D.experience[i] ?? {};
+    const b = document.createElement('button');
+    b.className  = 'c-dot' + (i === cur ? ' on' : '');
+    b.textContent = String(i + 1);
+    b.setAttribute('aria-label', `Go to experience ${i + 1}: ${String(exp_i.title ?? '')}`);
+    b.setAttribute('aria-pressed', String(i === cur));
+    b.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(b);
+  }
+
+  // ── Sidebar nav active state + aria-current ──
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', i === cur);
+    el.setAttribute('aria-current', String(i === cur));
+  });
+
+  // ── Update prev/next button labels to name the destination ──
+  const prevExp = D.experience[(cur - 1 + total) % total] ?? {};
+  const nextExp = D.experience[(cur + 1) % total]         ?? {};
+  document.getElementById('prev-btn').setAttribute('aria-label', `Previous: ${String(prevExp.title ?? '')}`);
+  document.getElementById('next-btn').setAttribute('aria-label', `Next: ${String(nextExp.title ?? '')}`);
 }
 
-function goTo(index){
-  if(index===cur) return;
-  const card=document.getElementById('c-card');
-  const dir=index>cur?'fade-right':'fade-left';
+function goTo(index) {
+  if (index === cur) return;
+  const card = document.getElementById('c-card');
+  const dir  = index > cur ? 'fade-right' : 'fade-left';
   card.classList.add(dir);
-  setTimeout(()=>{cur=index;renderCarousel();renderProjects();card.classList.remove(dir);},280);
+  setTimeout(() => {
+    cur = index;
+    renderCarousel();
+    renderProjects();
+    card.classList.remove(dir);
+  }, 280);
 }
 
-document.getElementById('prev-btn').addEventListener('click',()=>goTo((cur-1+D.experience.length)%D.experience.length));
-document.getElementById('next-btn').addEventListener('click',()=>goTo((cur+1)%D.experience.length));
+document.getElementById('prev-btn').addEventListener('click', () =>
+  goTo((cur - 1 + D.experience.length) % D.experience.length));
+document.getElementById('next-btn').addEventListener('click', () =>
+  goTo((cur + 1) % D.experience.length));
+
+// Arrow-key navigation for the carousel when focus is inside it
+document.getElementById('c-card').closest('.carousel-wrap').addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft')  goTo((cur - 1 + D.experience.length) % D.experience.length);
+  if (e.key === 'ArrowRight') goTo((cur + 1) % D.experience.length);
+});
 
 /* ── PROJECTS ── */
-function renderProjects(){
-  const jobId=D.experience[cur].id, projects=D.projects[jobId]||[];
-  activeFilt='All';
-  const cats=['All',...new Set(projects.map(p=>p.cat).filter(Boolean))];
-  const fb=document.getElementById('filter-bar'); fb.innerHTML='';
-  cats.forEach(cat=>{
-    const b=document.createElement('button');
-    b.className='f-btn'+(cat==='All'?' on':''); b.textContent=cat;
-    b.addEventListener('click',()=>{activeFilt=cat;fb.querySelectorAll('.f-btn').forEach(x=>x.classList.toggle('on',x.textContent===cat));renderGrid(projects);});
+function renderProjects() {
+  const jobId    = String(D.experience[cur]?.id ?? '');
+  const projects = Array.isArray(D.projects[jobId]) ? D.projects[jobId] : [];
+  activeFilt     = 'All';
+
+  const cats = ['All', ...new Set(projects.map(p => String(p.cat ?? '')).filter(Boolean))];
+  const fb   = document.getElementById('filter-bar');
+  fb.replaceChildren();
+
+  cats.forEach(cat => {
+    const b = document.createElement('button');
+    b.className  = 'f-btn' + (cat === 'All' ? ' on' : '');
+    b.textContent = cat;
+    b.setAttribute('aria-pressed', String(cat === 'All'));
+    b.addEventListener('click', () => {
+      activeFilt = cat;
+      fb.querySelectorAll('.f-btn').forEach(x => {
+        const isActive = x.textContent === cat;
+        x.classList.toggle('on', isActive);
+        x.setAttribute('aria-pressed', String(isActive));
+      });
+      renderGrid(projects);
+    });
     fb.appendChild(b);
   });
+
   renderGrid(projects);
 }
 
-function renderGrid(projects){
-  const grid=document.getElementById('proj-grid');
-  const filtered=activeFilt==='All'?projects:projects.filter(p=>p.cat===activeFilt);
-  grid.innerHTML='';
-  filtered.forEach(p=>{
-    const card=document.createElement('div'); card.className='proj-card';
-    card.innerHTML=`<div class="proj-cat">${esc(p.cat)}</div><div class="proj-name">${esc(p.title)}</div><span class="proj-arrow">→</span>`;
-    card.addEventListener('click',()=>openModal(p));
+function renderGrid(projects) {
+  const grid     = document.getElementById('proj-grid');
+  const filtered = activeFilt === 'All'
+    ? projects
+    : projects.filter(p => String(p.cat ?? '') === activeFilt);
+
+  grid.replaceChildren();
+
+  filtered.forEach(p => {
+    const safeCat   = String(p.cat   ?? '');
+    const safeTitle = String(p.title ?? '');
+
+    // Build entirely with DOM API — no innerHTML for user-supplied data
+    const card = document.createElement('div');
+    card.className = 'proj-card';
+    card.setAttribute('role', 'button');       // interactive div needs a role
+    card.setAttribute('tabindex', '0');        // keyboard focusable
+    card.setAttribute('aria-label', safeTitle + (safeCat ? ' — ' + safeCat : ''));
+
+    const catEl       = document.createElement('div');
+    catEl.className   = 'proj-cat';
+    catEl.textContent = safeCat;
+    catEl.setAttribute('aria-hidden', 'true'); // covered by card aria-label
+
+    const nameEl       = document.createElement('div');
+    nameEl.className   = 'proj-name';
+    nameEl.textContent = safeTitle;
+    nameEl.setAttribute('aria-hidden', 'true');
+
+    const arrow       = document.createElement('span');
+    arrow.className   = 'proj-arrow';
+    arrow.textContent = '→';
+    arrow.setAttribute('aria-hidden', 'true'); // decorative
+
+    card.appendChild(catEl);
+    card.appendChild(nameEl);
+    card.appendChild(arrow);
+
+    // Support both click and keyboard (Enter / Space) activation
+    card.addEventListener('click', () => openModal(p));
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openModal(p);
+      }
+    });
+
     grid.appendChild(card);
   });
 }
 
 /* ── MODAL ── */
-function openModal(p){
-  document.getElementById('m-cat').textContent=p.cat;
-  document.getElementById('m-title').textContent=p.title;
-  document.getElementById('m-desc').textContent=p.desc;
-  document.getElementById('modal').classList.add('open');
-  document.body.style.overflow='hidden';
+
+// Track the element that had focus before the modal opened so we can restore it.
+let _modalTrigger = null;
+
+// All focusable elements inside the modal box for focus-trap cycling.
+const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+function openModal(p) {
+  document.getElementById('m-cat').textContent   = String(p.cat   ?? '');
+  document.getElementById('m-title').textContent = String(p.title ?? '');
+  document.getElementById('m-desc').textContent  = String(p.desc  ?? '');
+
+  const modal = document.getElementById('modal');
+  _modalTrigger = document.activeElement; // remember where focus came from
+
+  // Switch from hidden to open — no inline display style needed
+  modal.removeAttribute('hidden');
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden'; // intentional layout side-effect, not a visibility toggle
+
+  // Move focus to the close button as the first logical element in the dialog
+  document.getElementById('modal-close').focus();
 }
-function closeModal(){
-  document.getElementById('modal').classList.remove('open');
-  document.body.style.overflow='';
+
+function closeModal() {
+  const modal = document.getElementById('modal');
+  modal.classList.remove('open');
+  modal.setAttribute('hidden', '');
+  document.body.style.overflow = '';
+
+  // Return focus to the element that opened the modal
+  if (_modalTrigger && typeof _modalTrigger.focus === 'function') {
+    _modalTrigger.focus();
+  }
+  _modalTrigger = null;
 }
-document.getElementById('modal-close').addEventListener('click',closeModal);
-document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// Focus trap — keep Tab / Shift+Tab cycling within the modal while it is open
+document.getElementById('modal').addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); return; }
+  if (e.key !== 'Tab') return;
+
+  const modal      = document.getElementById('modal');
+  const focusable  = Array.from(modal.querySelectorAll(FOCUSABLE));
+  const first      = focusable[0];
+  const last       = focusable[focusable.length - 1];
+
+  if (e.shiftKey) {
+    if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+  } else {
+    if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+  }
+});
 
 /* ── THEME TOGGLE ── */
 const toggleBtn = document.getElementById('theme-toggle');
-// URL param (from return link) takes priority; fall back to YAML default_theme
+// URL param (from return link on demos.html) takes priority; fall back to YAML default_theme
 const _urlTheme = new URLSearchParams(window.location.search).get('theme');
 let isDark = _urlTheme ? _urlTheme === 'dark' : D.defaultTheme === 'dark';
-document.body.classList.toggle('dark', isDark);
-toggleBtn.textContent = isDark ? '☀️' : '🌙';
 
-function syncDemosTheme() {
+function applyTheme() {
+  document.body.classList.toggle('dark', isDark);
+  toggleBtn.textContent = isDark ? '☀️' : '🌙';
+  toggleBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+  // Sync the demos pill href so it carries the theme across pages
   const pill = document.querySelector('.demos-pill');
   if (pill) pill.href = 'demos.html?theme=' + (isDark ? 'dark' : 'light');
 }
-syncDemosTheme();
+
+applyTheme(); // apply on load
 
 toggleBtn.addEventListener('click', () => {
   isDark = !isDark;
-  document.body.classList.toggle('dark', isDark);
-  toggleBtn.textContent = isDark ? '☀️' : '🌙';
-  syncDemosTheme();
+  applyTheme();
 });
 
 /* ── DEMOS SHAKE ── */
@@ -707,6 +995,8 @@ buildSidebar();
 buildHero();
 renderCarousel();
 renderProjects();
+
+})();
 </script>
 </body>
 </html>

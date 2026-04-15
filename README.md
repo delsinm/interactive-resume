@@ -28,6 +28,10 @@ Optional page for listing technical demos, enabled or disabled in code. Demos ar
 
 A moon/sun toggle button in the top-right corner switches between light and dark themes. (default theme can be specified in code)
 
+### Screen Reader Support
+
+WAI-ARIA support so your resume can be viewed by everyone.
+
 ---
 
 ## Quick Start
@@ -52,7 +56,7 @@ Because everything is self-contained in one file, you can host it anywhere that 
 
 ## Editing the YAML
 
-Open `index.html` in any text editor and jump to **line 269** — you'll find the `<script type="text/yaml" id="resume-data">` block. Everything inside it controls what appears on the page.
+Open `index.html` in any text editor and jump to **line 329** — you'll find the `<script type="text/yaml" id="resume-data">` block. Everything inside it controls what appears on the page.
 
 The block has five sections, described below.
 
