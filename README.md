@@ -77,9 +77,10 @@ candidate:
 | `email`       | optional | If present, an **Email** button appears linking to `mailto:` |
 | `linkedin`    | optional | If present, a **LinkedIn** button appears linking to the URL |
 | `github`      | optional | If present, a **GitHub** button appears linking to the URL   |
+| `blog`        | optional | If present, a **Blog** button appears linking to the URL     |
 
 
-Omit or leave blank any of `email`, `linkedin`, or `github` to hide that button entirely.
+Omit or leave blank any of `email`, `linkedin`, `github` , or `blog` to hide that button entirely.
 
 ---
 

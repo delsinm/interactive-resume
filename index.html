@@ -20,7 +20,8 @@
          email       - if present, shows an Email link
          linkedin    - if present, shows a LinkedIn link
          github      - if present, shows a GitHub link
-       Omit or leave blank any of email / linkedin / github to hide that link.
+         blog        - if present, shows a Blog link
+       Omit or leave blank any of email / linkedin / github / blog to hide that link.
 
     2. default_theme
        Sets the initial color scheme when the page first loads.
@@ -36,13 +37,7 @@
        NOTE: The button links to demos.html. That file must exist in the same
        folder as index.html for the link to work.
 
-    4. headshot
-       Controls whether the professional headshot appears in the sidebar.
-         headshot: true    — headshot is visible (default)
-         headshot: false   — headshot is hidden
-       NOTE: The headshot image must exist in the same folder as index.html for it to be displayed.
-
-    5. experience
+    4. experience
        A list of jobs shown in the carousel. Each entry has:
          id          - unique key that links to the projects section (e.g. "job0")
                        Keep this stable — changing it breaks the project link.
@@ -56,7 +51,7 @@
        To REORDER jobs: move the entries freely — order on the page follows
                         the order in this list.
 
-    6. projects
+    5. projects
        A map of job id → list of project cards.
        Each project has:
          title - project name shown on the card
@@ -265,14 +260,14 @@ body.dark{--bg:#0d0d0f;--surface:#131316;--card:#18181d;--card2:#1e1e25;--border
      ═══════════════════════════════════════════════════════════════════════ -->
 <script type="text/yaml" id="resume-data">
 # Candidate info — name and description are required; contact links are optional.
-# Omit (or leave blank) any of email, linkedin, or github to hide that link.
+# Omit (or leave blank) any of email, linkedin, github, or blog to hide that link.
 candidate:
   name: "Ash Ketchum"
   description: "Staff DevOps Engineer & Pokémon Master"
   email: "ash@catchmall.io"
   linkedin: "https://linkedin.com/in/ashketchum"
   github: "https://github.com/ashketchum"
-  headshot: true  # set to false to hide the headshot and collapse the space (requires "headshot.jpg" or "headshot.png" in the same folder as index.html)
+  blog: "https://blog.catchmall.io"
 
 # Initial color scheme: "light" (default) or "dark"
 default_theme: light
@@ -486,6 +481,7 @@ projects:
         email:       c.email       || '',
         linkedin:    c.linkedin    || '',
         github:      c.github      || '',
+        blog:        c.blog        || '',
         headshot:    c.headshot    !== false,
       },
       defaultTheme: parsed.default_theme === 'dark' ? 'dark' : 'light',
@@ -524,6 +520,7 @@ function safeUrl(url) {
 const iMail = `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`;
 const iLi   = `<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>`;
 const iGh   = `<svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>`;
+const iBlog = `<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
 
 /* ── SIDEBAR ── */
 function buildSidebar(){
@@ -548,6 +545,7 @@ function buildSidebar(){
   if(c.email)    links.innerHTML += `<a href="${esc(safeUrl('mailto:'+c.email))}" class="sb-link">${iMail}${esc(c.email)}</a>`;
   if(c.linkedin) links.innerHTML += `<a href="${esc(safeUrl(c.linkedin))}" target="_blank" rel="noopener" class="sb-link">${iLi} LinkedIn</a>`;
   if(c.github)   links.innerHTML += `<a href="${esc(safeUrl(c.github))}" target="_blank" rel="noopener" class="sb-link">${iGh} GitHub</a>`;
+  if(c.blog)     links.innerHTML += `<a href="${esc(safeUrl(c.blog))}" target="_blank" rel="noopener" class="sb-link">${iBlog} Blog</a>`;
   const nav = document.getElementById('sb-nav-items');
   D.experience.forEach((exp,i)=>{
     const el = document.createElement('div');
