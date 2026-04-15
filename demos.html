@@ -10,6 +10,9 @@
         stack       — Array of technology badges shown at the bottom of the card
         link        — URL the card links to when clicked (opens in a new tab)
                       Leave as an empty string ("") to make the card non-clickable
+                      NOTE: Only https:// and http:// URLs are accepted. Any other
+                      scheme (javascript:, data:, etc.) will be silently dropped and
+                      the card will render as non-clickable.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -58,7 +61,7 @@ body.dark{--bg:#0d0d0f;--surface:#131316;--card:#18181d;--card2:#1e1e25;--border
 .sec-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.06em;color:var(--t1)}
 .sec-rule{flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
 
-.demo-list{display:flex;flex-direction:column;gap:12px}
+.demo-list{display:flex;flex-direction:column;gap:12px;list-style:none;padding:0;margin:0}
 
 .demo-card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:2px;padding:26px 28px 22px;overflow:hidden;transition:all .2s;text-decoration:none;color:inherit;display:block}
 .demo-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent 60%);opacity:0;transition:opacity .2s}
@@ -81,42 +84,51 @@ body.dark{--bg:#0d0d0f;--surface:#131316;--card:#18181d;--card2:#1e1e25;--border
 .au{animation:fadeUp .5s ease both}
 .d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}.d4{animation-delay:.26s}.d5{animation-delay:.33s}.d6{animation-delay:.4s}
 
+@media(prefers-reduced-motion:reduce){.au{animation:none}.demo-card{transition:none}.demo-card::after{transition:none}.tech-badge{transition:none}.link-arrow{transition:none}}
+
+.demo-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.theme-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.back-link:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
 @media(max-width:600px){.page{padding:32px 20px}}
 </style>
 </head>
 <body>
 
-<button class="theme-toggle" id="theme-toggle">🌙</button>
+<button class="theme-toggle" id="theme-toggle" aria-label="Switch to dark mode">🌙</button>
 
 <div class="page">
 
   <div class="page-header au d1">
     <a href="index.html" class="back-link">
-      <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="14" height="14" fill="none" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Back to Resume
     </a>
   </div>
 
   <div class="hero au d2">
-    <div class="hero-eye">Portfolio</div>
+    <div class="hero-eye" aria-hidden="true">Portfolio</div>
     <div class="hero-wrap">
-      <div class="hero-ghost">Technical Demos</div>
+      <div class="hero-ghost" aria-hidden="true">Technical Demos</div>
       <h1 class="hero-name">Technical Demos</h1>
     </div>
-    <p class="hero-sub"><span class="hero-line"></span>Prototypes, workflow automations, and lab environments built to solve operational challenges.</p>
+    <p class="hero-sub"><span class="hero-line" aria-hidden="true"></span>Prototypes, workflow automations, and lab environments built to solve operational challenges.</p>
   </div>
 
   <div class="sec-head au d3">
-    <span class="sec-num">01</span>
+    <span class="sec-num" aria-hidden="true">01</span>
     <h2 class="sec-title">Projects</h2>
-    <div class="sec-rule"></div>
+    <div class="sec-rule" aria-hidden="true"></div>
   </div>
 
-  <div class="demo-list" id="demo-list"></div>
+  <ul class="demo-list" id="demo-list" aria-label="Technical demo projects"></ul>
 
 </div>
 
 <script>
+(function () {
+'use strict';
+
 const demoData = [
   {
     name: "Okta Workflow Bot V4",
@@ -148,34 +160,113 @@ const demoData = [
   }
 ];
 
-const list = document.getElementById('demo-list');
+// Allowlist: only https/http links are accepted.
+// Blocks javascript:, data:, vbscript:, and any other non-http scheme.
+function sanitizeUrl(url) {
+  if (!url || typeof url !== 'string') return null;
+  try {
+    const parsed = new URL(url);
+    return (parsed.protocol === 'https:' || parsed.protocol === 'http:')
+      ? parsed.href
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+const list   = document.getElementById('demo-list');
 const delays = ['d4','d4','d5','d5','d6','d6'];
 
 demoData.forEach((demo, i) => {
-  const el = document.createElement(demo.link ? 'a' : 'div');
-  el.className = `demo-card au ${delays[i] || 'd6'}`;
-  if (demo.link) { el.href = demo.link; el.target = '_blank'; el.rel = 'noopener noreferrer'; }
+  const safeLink = sanitizeUrl(demo.link);
+  const safeName = String(demo.name ?? '');
+  const safeCategory = String(demo.category ?? '');
+  const safeDesc = String(demo.description ?? '');
 
-  const badges = demo.stack.map(t => `<span class="tech-badge">${t}</span>`).join('');
-  const arrow  = demo.link ? `<span class="link-arrow">↗</span>` : '';
+  // Wrap each card in a <li> to match the <ul> container
+  const li = document.createElement('li');
 
-  el.innerHTML = `
-    <span class="demo-tag">${demo.category}</span>
-    <div class="demo-name">${demo.name}</div>
-    <div class="demo-desc">${demo.description}</div>
-    <div class="demo-footer"><div class="demo-stack">${badges}</div>${arrow}</div>`;
+  // Use <a> only when the URL passed protocol validation
+  const card = document.createElement(safeLink ? 'a' : 'div');
+  card.className = `demo-card au ${delays[i] || 'd6'}`;
 
-  list.appendChild(el);
+  // Full accessible label: "Name — Category. Description. Opens in a new tab."
+  const cardLabel = safeLink
+    ? `${safeName} — ${safeCategory}. ${safeDesc}. Opens in a new tab.`
+    : `${safeName} — ${safeCategory}. ${safeDesc}.`;
+  card.setAttribute('aria-label', cardLabel);
+
+  if (safeLink) {
+    card.href   = safeLink;   // assigned as a property, never via innerHTML
+    card.target = '_blank';
+    card.rel    = 'noopener noreferrer';
+  } else {
+    // Non-linked cards need a role and tabindex to be keyboard-reachable
+    card.setAttribute('role', 'region');
+  }
+
+  // -- tag (decorative duplicate of the aria-label category — hide from AT) --
+  const tag = document.createElement('span');
+  tag.className   = 'demo-tag';
+  tag.textContent = safeCategory;
+  tag.setAttribute('aria-hidden', 'true');
+
+  // -- name --
+  const name = document.createElement('div');
+  name.className   = 'demo-name';
+  name.textContent = safeName;
+  name.setAttribute('aria-hidden', 'true');
+
+  // -- description --
+  const desc = document.createElement('div');
+  desc.className   = 'demo-desc';
+  desc.textContent = safeDesc;
+  desc.setAttribute('aria-hidden', 'true');
+
+  // -- footer: stack badges + optional arrow --
+  const footer = document.createElement('div');
+  footer.className = 'demo-footer';
+  footer.setAttribute('aria-hidden', 'true'); // full label is on the card; badges are supplemental
+
+  const stackEl = document.createElement('div');
+  stackEl.className = 'demo-stack';
+
+  const stack = Array.isArray(demo.stack) ? demo.stack : [];
+  stack.forEach(tech => {
+    const badge = document.createElement('span');
+    badge.className   = 'tech-badge';
+    badge.textContent = String(tech);   // textContent — never innerHTML
+    stackEl.appendChild(badge);
+  });
+
+  footer.appendChild(stackEl);
+
+  if (safeLink) {
+    const arrow = document.createElement('span');
+    arrow.className   = 'link-arrow';
+    arrow.textContent = '↗';
+    arrow.setAttribute('aria-hidden', 'true'); // decorative; info is in the card aria-label
+    footer.appendChild(arrow);
+  }
+
+  card.appendChild(tag);
+  card.appendChild(name);
+  card.appendChild(desc);
+  card.appendChild(footer);
+
+  li.appendChild(card);
+  list.appendChild(li);
 });
 
+// ----- theme toggle -----
 const toggleBtn = document.getElementById('theme-toggle');
-const backLink   = document.querySelector('.back-link');
+const backLink  = document.querySelector('.back-link');
 
-// Read theme from query string; default to light
 const params = new URLSearchParams(window.location.search);
 let isDark = params.get('theme') === 'dark';
 document.body.classList.toggle('dark', isDark);
 toggleBtn.textContent = isDark ? '☀️' : '🌙';
+toggleBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
 
 function syncBackLink() {
   if (backLink) backLink.href = 'index.html?theme=' + (isDark ? 'dark' : 'light');
@@ -186,8 +277,11 @@ toggleBtn.addEventListener('click', () => {
   isDark = !isDark;
   document.body.classList.toggle('dark', isDark);
   toggleBtn.textContent = isDark ? '☀️' : '🌙';
+  toggleBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
   syncBackLink();
 });
+
+})();
 </script>
 </body>
 </html>
