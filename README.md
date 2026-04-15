@@ -132,11 +132,11 @@ Controls whether the **Demos!** button appears in the top-left corner of the pag
 
 ---
 
-### 4. `headshot` — Professional Headshot
+### 4. `show_headshot` — Professional Headshot
 
 ```yaml
-headshot: true    # show professional headshot 
-headshot: false   # hide professional headshot
+show_headshot: true    # show professional headshot 
+show_headshot: false   # hide professional headshot
 ```
 
 Displays a professional headshot in the upper left corner. Requires `headshot.png` or `headshot.jpg` in the same folder as `index.html`.
