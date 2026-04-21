@@ -154,7 +154,7 @@ default_theme: light  # start in light mode (default if omitted)
 default_theme: dark   # start in dark mode
 ```
 
-Sets the color scheme the page loads in. Accepts `"light"` or `"dark"`. If the key is omitted entirely, the page defaults to light mode.
+Sets the color scheme the page loads in. Accepts `"light"` or `"dark"`. If the key is omitted entirely, the page defaults to client OS settings.
 
 Visitors can always toggle between light and dark using the button in the top-right corner of the page. When they navigate between `index.html` and `demos.html`, the active theme is passed along automatically via a URL parameter (`?theme=dark` or `?theme=light`), so the color scheme stays consistent across both pages.
 
