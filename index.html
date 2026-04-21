@@ -25,10 +25,11 @@
 
     2. default_theme
        Sets the initial color scheme when the page first loads.
-         default_theme: light  — start in light mode (default if omitted)
+         default_theme: light  — start in light mode
          default_theme: dark   — start in dark mode
-       The user can still toggle between modes at any time with the
-       button in the top-right corner.
+       If omitted, the page respects the viewer's OS light/dark setting
+       (prefers-color-scheme). The user can still toggle at any time with
+       the button in the top-right corner.
 
     3. show_demos
        Controls whether the "View Demos" button appears in the sidebar.
@@ -957,11 +958,34 @@ document.getElementById('modal').addEventListener('keydown', e => {
   }
 });
 
+/* ── CAROUSEL SWIPE (touch) ── */
+(function () {
+  const card = document.getElementById('c-card');
+  let _tx = null; // touchstart X
+
+  card.addEventListener('touchstart', e => {
+    _tx = e.changedTouches[0].clientX;
+  }, { passive: true });
+
+  card.addEventListener('touchend', e => {
+    if (_tx === null) return;
+    const dx = e.changedTouches[0].clientX - _tx;
+    _tx = null;
+    if (Math.abs(dx) < 40) return; // ignore tiny taps
+    if (dx < 0) {
+      document.getElementById('next-btn').click(); // swipe left → next
+    } else {
+      document.getElementById('prev-btn').click(); // swipe right → prev
+    }
+  }, { passive: true });
+})();
+
 /* ── THEME TOGGLE ── */
 const toggleBtn = document.getElementById('theme-toggle');
-// URL param (from return link on demos.html) takes priority; fall back to YAML default_theme
+// Priority: 1) URL param (return link from demos.html), 2) system prefers-color-scheme, 3) YAML default_theme
 const _urlTheme = new URLSearchParams(window.location.search).get('theme');
-let isDark = _urlTheme ? _urlTheme === 'dark' : D.defaultTheme === 'dark';
+const _systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+let isDark = _urlTheme ? _urlTheme === 'dark' : (D.defaultTheme ? D.defaultTheme === 'dark' : _systemDark);
 
 function applyTheme() {
   document.body.classList.toggle('dark', isDark);
